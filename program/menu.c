@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "menu.h"
+#include "catalog.h"
 
 int displayMainMenu(void) {
     int selection;
@@ -35,7 +36,7 @@ void handleOperationalOptions(void) {
         
         switch (selectedOption) {
             case OPERATIONAL_MENU_CATALOG:
-                printf("\n Gestión de catálogo...\n");
+                handleCatalogOptions();
                 break;
                 
             case OPERATIONAL_MENU_USERS:
