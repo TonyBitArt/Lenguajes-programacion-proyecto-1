@@ -1,10 +1,9 @@
 #include <stdio.h>
-#include "menu.h"
-#include "catalog.h"
+#include "../headers/menu.h"
+#include "../headers/catalog.h"
+#include "../headers/inputUtils.h"
 
 int displayMainMenu(void) {
-    int selection;
-    
     printf("\n========================================\n");
     printf("      SISTEMA DE GESTIÓN DE BIBLIOTECA\n");
     printf("========================================\n");
@@ -14,9 +13,7 @@ int displayMainMenu(void) {
     printf("========================================\n");
     printf("Seleccione una opción: ");
     
-    scanf("%d", &selection);
-    
-    return selection;
+    return validateInt(); 
 }
 
 void handleOperationalOptions(void) {
@@ -32,7 +29,7 @@ void handleOperationalOptions(void) {
         printf("%d. Volver\n", OPERATIONAL_MENU_BACK);
         printf("Seleccione una opción: ");
         
-        scanf("%d", &selectedOption);
+        selectedOption = validateInt();
         
         switch (selectedOption) {
             case OPERATIONAL_MENU_CATALOG:
@@ -79,7 +76,7 @@ void handleGeneralOptions(void) {
         printf("%d. Volver\n", GENERAL_MENU_BACK);
         printf("Seleccione una opción: ");
         
-        scanf("%d", &selectedOption);
+        selectedOption = validateInt();
         
         switch (selectedOption) {
             case GENERAL_MENU_SIMPLE_SEARCH:

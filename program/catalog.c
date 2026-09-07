@@ -1,9 +1,8 @@
 #include <stdio.h>
-#include "catalog.h"
+#include "../headers/catalog.h"
+#include "../headers/inputUtils.h"
 
 int displayCatalogMenu(void) {
-    int selectedOption;
-    
     printf("\n--- Submenú de Gestión de Catálogo ---\n");
     printf("%d. Ver ejemplares\n", CATALOG_MENU_VIEW);
     printf("%d. Agregar ejemplar\n", CATALOG_MENU_ADD);
@@ -11,9 +10,7 @@ int displayCatalogMenu(void) {
     printf("%d. Volver\n", CATALOG_MENU_BACK);
     printf("Seleccione una opción: ");
     
-    scanf("%d", &selectedOption);
-    
-    return selectedOption;
+    return validateInt();
 }
 
 void handleCatalogOptions(void) {
