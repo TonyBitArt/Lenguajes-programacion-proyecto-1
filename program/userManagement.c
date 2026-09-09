@@ -58,14 +58,14 @@ void addUser() {
         printf("Numero de identificacion: ");
         int userID = validateInt();
 
-        if (validateID(userID) == 0) {
-            pauseScreen();
-            continue;
-        }
-
         if (userID == 0) {
             clearScreen();
             return;
+        }
+
+        if (validateID(userID) == 0) {
+            pauseScreen();
+            continue;
         }
 
         printf("Nombre: ");
