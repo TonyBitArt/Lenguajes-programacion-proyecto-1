@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "../cJSON/cJSON.h"
 #include "../headers/jsonHandler.h"
+#include "../headers/inputUtils.h"
 
 char *readFile(const char *path) {
     FILE *file = fopen(path, "rb"); // Abrir el archivo en modo lectura/binario
@@ -139,3 +140,36 @@ struct Loan *parseLoans(const char *path, int *loanCount){
     return loans;
 }
 
+
+/**
+ * @brief Guarda un nuevo usuario en un archivo JSON.
+ * @param path La ruta del archivo JSON donde se guardará el usuario.
+ * @param newUser La estructura User que contiene los datos del nuevo usuario.
+ * @return int 1 si el usuario se guardó exitosamente, 0 si ocurrió un error.
+ */
+int saveUser(const char *path, struct User newUser) {
+    cJSON *usersArray = parseJsonFile(path);
+    
+    if (!usersArray) {
+        usersArray = cJSON_CreateArray();
+    }
+
+    cJSON *userObject = cJSON_CreateObject();
+
+    if (!userObject) {
+        cJSON_Delete(usersArray);
+        return 0;
+    }
+
+    cJSON_AddStringToObject(userObject, "name", newUser.name);
+    cJSON_AddStringToObject(userObject, "lastName", newUser.lastName);
+    cJSON_AddNumberToObject(userObject, "ID", newUser.ID);
+    cJSON_AddStringToObject(userObject, "address", newUser.address);
+
+    
+    cJSON_AddItemToArray(usersArray, userObject);
+    int success = saveJsonToFile(path, usersArray);
+
+    cJSON_Delete(usersArray);
+    return success; 
+}
