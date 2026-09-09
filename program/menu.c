@@ -2,6 +2,7 @@
 #include "../headers/menu.h"
 #include "../headers/catalog.h"
 #include "../headers/inputUtils.h"
+#include "../headers/userManagement.h"
 
 int displayMainMenu(void) {
     printf("\n========================================\n");
@@ -37,7 +38,7 @@ void handleOperationalOptions(void) {
                 break;
                 
             case OPERATIONAL_MENU_USERS:
-                printf("\n Gestión de usuarios...\n");
+                userOptions();
                 break;
                 
             case OPERATIONAL_MENU_HISTORY:

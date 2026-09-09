@@ -1,6 +1,8 @@
 #ifndef JSONHANDLER_H
 #define JSONHANDLER_H
 
+#include "../cJSON/cJSON.h"
+
 struct User {
     char *name;
     char *lastName;
@@ -64,5 +66,12 @@ struct Loan *parseLoans(const char *path, int *loanCount);
  */
 cJSON *parseJsonFile(const char *path);
 
+/**
+ * @brief Guarda un nuevo usuario en el archivo JSON.
+ * @param path La ruta del archivo JSON.
+ * @param newUser La estructura del nuevo usuario a guardar.
+ * @return int 1 si fue exitoso, 0 si hubo un error.
+ */
+int saveUser(const char *path, struct User newUser);
 
 #endif // JSONHANDLER_H
