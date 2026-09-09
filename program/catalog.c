@@ -48,7 +48,31 @@ void handleCatalogOptions(void) {
             }
                 
             case CATALOG_MENU_ADD:
-                printf("\n Agregar ejemplar...\n");
+                printf("\n--- Menú de Agregar Ejemplar ---\n");
+                printf("1. Agregar un solo libro \n");
+                printf("2. Agregar por lote (Desde un archivo .txt)\n");
+                printf("3. Cancelar y volver\n");
+                printf("Seleccione una opción: ");
+                
+                int addOption = validateInt();
+
+                switch (addOption) {
+                    case 1: {
+                        printf("\n--- Agregar libro manualmente ---\n");
+                        break;
+                    }
+                    case 2: {
+                        printf("\n--- Agregar ejemplares en lote ---\n");
+                        break;
+                    }
+                    case 3:
+                        printf("\nCancelando ingreso...\n");
+                        break;
+                    default:
+                        printf("\nOpción inválida, volviendo al menú del catálogo...\n");
+                        break;
+                }    
+            
                 break;
                 
             case CATALOG_MENU_EDIT:
