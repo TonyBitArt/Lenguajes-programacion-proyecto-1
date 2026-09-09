@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "../cJSON/cJSON.h"
 #include "../headers/jsonHandler.h"
 
@@ -93,11 +94,12 @@ struct Book *parseBooks(const char *path, int *bookCount) {
         cJSON *summaryJson = cJSON_GetObjectItem(bookJson, "summary");
         cJSON *quantityJson = cJSON_GetObjectItem(bookJson, "quantity");
 
-        books[i].name = nameJson ? nameJson->valuestring : NULL;
-        books[i].author = authorJson ? authorJson->valuestring : NULL;
+        // Uso strdup para proteger la memoria de los textos
+        books[i].name = (nameJson && nameJson->valuestring) ? strdup(nameJson->valuestring) : NULL;
+        books[i].author = (authorJson && authorJson->valuestring) ? strdup(authorJson->valuestring) : NULL;
         books[i].year = yearJson ? yearJson->valueint : 0;
-        books[i].genre = genreJson ? genreJson->valuestring : NULL;
-        books[i].summary = summaryJson ? summaryJson->valuestring : NULL;
+        books[i].genre = (genreJson && genreJson->valuestring) ? strdup(genreJson->valuestring) : NULL;
+        books[i].summary = (summaryJson && summaryJson->valuestring) ? strdup(summaryJson->valuestring) : NULL;
         books[i].quantity = quantityJson ? quantityJson->valueint : 0;
     }
     cJSON_Delete(booksJson);

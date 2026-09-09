@@ -1,5 +1,6 @@
 #ifndef JSONHANDLER_H
 #define JSONHANDLER_H
+#include "../cJSON/cJSON.h"
 
 struct User {
     char *name;
