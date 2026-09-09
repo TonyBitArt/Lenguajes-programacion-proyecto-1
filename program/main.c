@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include "../headers/menu.h"
+#include "../headers/inputUtils.h"
+
+
 
 int main() {
     int selectedOption;
