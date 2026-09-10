@@ -1,44 +1,123 @@
+/**
+ * @file userManagement.c
+ * @brief Archivo que contiene la implementación de la gestión de usuarios.
+ */
+
+
+// Includes de la librería estándar
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "../headers/userManagement.h"
-#include "../headers/inputUtils.h"
-#include "../headers/jsonHandler.h"
 
+
+// Includes de los archivos de cabecera del proyecto
+#include "../headers/userManagement.h"
+#include "../headers/jsonHandler.h"
+#include "../headers/userUtils.h"
+#include "../headers/inputUtils.h"
+#include "../headers/config.h"
 
 
 /**
- * @brief Muestra las opciones de gestión de usuarios.
+ * @brief Busca y muestra todos los usuarios registrados.
  * @return void
  */
-void printUserOptions() {
-    printf("\n========================================\n");
-    printf("          GESTIÓN DE USUARIOS\n");
-    printf("========================================\n");
-    printf("1. Ver usuarios\n");
-    printf("2. Agregar usuario\n");
-    printf("3. Modificar usuario\n");
-    printf("4. Eliminar usuario\n");
-    printf("5. Volver\n");
-    printf("========================================\n");
-    printf("Seleccione una opción: ");
+void searchAllUsers() {
+    struct User *users = NULL;
+    int userCount = 0;
+
+    if (!getAllUsers(USERS_FILE_PATH, &users, &userCount)) {
+        printf("Error: No se pudo leer el archivo JSON.\n");
+        pauseScreen();
+        return;
+    }
+
+    if (userCount == 0) {
+        printf("No hay usuarios registrados.\n");
+    } else {
+        printAllUsers(users, userCount);
+    }
+
+    freeAllUsers(users, userCount);
+    pauseScreen();
 }
 
 
 /**
- * @brief Muestra el mensaje de agregar un nuevo usuario.
+ * @brief Busca un usuario por su ID.
  * @return void
  */
-void addUserMessage() {
-    printf("\n========================================\n");
-    printf("          AGREGAR NUEVO USUARIO\n");
-    printf("========================================\n");
-    printf("Datos solicitados:\n");
-    printf("- Número de identificación\n");
-    printf("- Nombre completo\n");
-    printf("- Dirección\n");
-    printf("Escriba 0 en cualquier campo para volver.\n");
-    printf("========================================\n");
+void searchUserByID() {
+    do {
+        clearScreen();
+        searchUserMessage();
+
+        printf("Ingrese el ID del usuario a buscar: ");
+        int userID = validateInt();
+
+        if (userID == 0) {
+            clearScreen();
+            return;
+        }
+
+        if (validateID(userID) == 0) {
+            pauseScreen();
+            continue;
+        }
+
+        struct User *user = getUserByID(USERS_FILE_PATH, userID);
+
+        if (user == NULL) {
+            printf("Usuario con ID %d no encontrado.\n", userID);
+        } else {
+            printUser(*user);
+            freeUser(user);
+            free(user);
+        }
+
+        pauseScreen();
+
+    } while(1);
+}
+
+
+
+/**
+ * @brief Muestra el menú de búsqueda de usuarios.
+ * @return void
+ */
+void searchUserMenu() {
+    do {
+        clearScreen();
+        printSearchUserOptions();
+
+        int input = validateInt();
+        
+        if (input == -1) {
+            printf("Error: Entrada inválida.\n");
+            pauseScreen();
+            continue;
+        }
+
+        switch (input) {
+            case 1:
+                searchAllUsers();
+                break;
+            
+            case 2:
+                searchUserByID();
+                break;
+
+            case 3:
+                return;
+            
+            default:
+                printf("Error: Opcion ingresada invalida\n");
+                pauseScreen();
+                break;
+            }
+
+    } while(1);
 }
 
 
@@ -49,84 +128,39 @@ void addUserMessage() {
  * @return void
  */
 void addUser() {
+    char *userName = NULL;
+    char *userLastName = NULL;
+    char *userAddress = NULL;
+    int cancelFlag = 0;
+
     do {
         clearScreen();
         addUserMessage();
 
-        printf("Ingrese los datos del nuevo usuario:\n");
-
         printf("Numero de identificacion: ");
         int userID = validateInt();
-
-        if (validateID(userID) == 0) {
-            pauseScreen();
-            continue;
-        }
 
         if (userID == 0) {
             clearScreen();
             return;
         }
 
-        printf("Nombre: ");
-        char *userName = readInput();
-
-        if (userName == NULL) {
-            printf("Error: No se pudo asignar memoria.\n");
-            pauseScreen();
-            return;
-        }
-
-        if (strcmp(userName, "0") == 0) {
-            free(userName);
-            clearScreen();
-            return;
-        }
-
-        if (isEmptyString(userName)) {
-            printf("Error: No se puede ingresar un campo vacío.\n");
-            free(userName);
+        if (validateID(userID) == 0 || existsUser(USERS_FILE_PATH, userID)) {
             pauseScreen();
             continue;
         }
 
-        printf("Apellido: ");
-        char *userLastName = readInput();
+        userName = validateUserInput("Nombre: ", &cancelFlag);
 
-        if (userLastName == NULL) {
-            printf("Error: No se pudo asignar memoria.\n");
-            free(userName);
-            pauseScreen();
-            return;
+        if (!cancelFlag) {
+            userLastName = validateUserInput("Apellido: ", &cancelFlag);
+        }
+        
+        if (!cancelFlag) {
+            userAddress = validateUserInput("Direccion: ", &cancelFlag);
         }
 
-        if (strcmp(userLastName, "0") == 0) {
-            free(userName);
-            free(userLastName);
-            clearScreen();
-            return;
-        }
-
-        if (isEmptyString(userLastName)) {
-            printf("Error: No se puede ingresar un campo vacío.\n");
-            free(userName);
-            free(userLastName);
-            pauseScreen();
-            continue;
-        }
-
-        printf("Direccion: ");
-        char *userAddress = readInput();
-
-        if (userAddress == NULL) {
-            printf("Error: No se pudo asignar memoria.\n");
-            free(userName);
-            free(userLastName);
-            pauseScreen();
-            return;
-        }
-
-        if (strcmp(userAddress, "0") == 0) {
+        if (cancelFlag) {
             free(userName);
             free(userLastName);
             free(userAddress);
@@ -134,35 +168,20 @@ void addUser() {
             return;
         }
 
-        if (isEmptyString(userAddress)) {
-            printf("Error: No se puede ingresar un campo vacío.\n");
-            free(userName);
-            free(userAddress);
-            free(userLastName);
-            pauseScreen();
-            continue;
-        }
+        struct User newUser = createUser(userID, userName, userLastName, userAddress);
 
-        struct User newUser;
-        newUser.ID = userID;
-        newUser.name = userName;
-        newUser.lastName = userLastName;
-        newUser.address = userAddress;
-
-        if (!saveUser("./data/users.json", newUser)) {
+        if (!saveUser(USERS_FILE_PATH, newUser)) {
             printf("Error: No se pudo guardar el usuario en el archivo JSON.\n");
         } else {
             printf("Usuario guardado exitosamente en el archivo JSON.\n");
         }
 
+        freeUser(&newUser);
         pauseScreen();
         clearScreen();
 
-        free(userName);
-        free(userLastName);
-        free(userAddress);
-        
         return;
+
     } while (1);
 }
 
@@ -184,7 +203,7 @@ void userOptions() {
 
         switch (input) {
             case 1:
-                printf("selecciono la opcion ver usuarios");
+                searchUserMenu();
                 break;
             
             case 2:

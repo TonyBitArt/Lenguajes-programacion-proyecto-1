@@ -1,7 +1,10 @@
 #ifndef JSONHANDLER_H
 #define JSONHANDLER_H
 
+
+// Includes de los archivos de cabecera del proyecto
 #include "../cJSON/cJSON.h"
+
 
 struct User {
     char *name;
@@ -9,6 +12,7 @@ struct User {
     int ID;
     char *address;
 };
+
 
 struct Book {
     char *name;
@@ -19,6 +23,7 @@ struct Book {
     int quantity;
 };
 
+
 struct Loan {
     int loanID;
     char *user;
@@ -28,12 +33,14 @@ struct Loan {
     char *returnDate;
 };
 
+
 /**
  * @brief Lee un archivo y devuelve su contenido como una cadena de caracteres.
  * @param path La ruta del archivo a leer.
  * @return char* Una cadena de caracteres que contiene el contenido del archivo. NULL si ocurre un error.
  */
 char *readFile(const char *path);
+
 
 /**
  * @brief Parsea un archivo JSON y devuelve un array de estructuras User.
@@ -43,6 +50,7 @@ char *readFile(const char *path);
  */
 struct User *parseUsers(const char *path, int *userCount);
 
+
 /**
  * @brief Parsea un archivo JSON y devuelve un array de estructuras Book.
  * @param path La ruta del archivo JSON a parsear.
@@ -50,6 +58,7 @@ struct User *parseUsers(const char *path, int *userCount);
  * @return struct Book* Un array de estructuras Book. NULL si ocurre un error.
  */
 struct Book *parseBooks(const char *path, int *bookCount);
+
 
 /**
  * @brief Parsea un archivo JSON y devuelve un array de estructuras Loan.
@@ -59,6 +68,7 @@ struct Book *parseBooks(const char *path, int *bookCount);
  */
 struct Loan *parseLoans(const char *path, int *loanCount);
 
+
 /**
  * @brief Parsea un archivo JSON y devuelve un objeto cJSON.
  * @param path La ruta del archivo JSON a parsear.
@@ -66,12 +76,24 @@ struct Loan *parseLoans(const char *path, int *loanCount);
  */
 cJSON *parseJsonFile(const char *path);
 
+
 /**
- * @brief Guarda un nuevo usuario en el archivo JSON.
+ * @brief Obtiene todos los usuarios de un archivo JSON.
  * @param path La ruta del archivo JSON.
- * @param newUser La estructura del nuevo usuario a guardar.
- * @return int 1 si fue exitoso, 0 si hubo un error.
+ * @param users Un puntero a un array de estructuras User.
+ * @param userCount Un puntero a un entero que se llenará con el número de usuarios en el archivo.
+ * @return struct User* Un array de estructuras User. NULL si ocurre un error.
  */
-int saveUser(const char *path, struct User newUser);
+struct User* getAllUsers(const char *path, struct User **users, int *userCount);
+
+
+/**
+ * @brief guarda un objeto JSON en un archivo
+ * @param path la ruta del archivo donde se guardará el JSON
+ * @param jsonObject el objeto JSON a guardar
+ * @return int 1 si se guardó exitosamente, 0 si ocurrió un error
+ */
+int saveJsonToFile(const char *path, cJSON *jsonObject);
+
 
 #endif // JSONHANDLER_H

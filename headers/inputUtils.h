@@ -1,9 +1,6 @@
 #ifndef INPUT_UTILS_H
 #define INPUT_UTILS_H
 
-#include "../cJSON/cJSON.h"
-
-
 
 /**
  * @brief lee una línea de texto ingresada por el usuario
@@ -52,13 +49,5 @@ int validateID(int id);
  */
 int countDigits(int number);
 
-
-/**
- * @brief guarda un objeto JSON en un archivo
- * @param path la ruta del archivo donde se guardará el JSON
- * @param jsonObject el objeto JSON a guardar
- * @return int 1 si se guardó exitosamente, 0 si ocurrió un error
- */
-int saveJsonToFile(const char *path, cJSON *jsonObject);
 
 #endif
