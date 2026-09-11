@@ -39,7 +39,7 @@ void pauseScreen();
  * @param id el ID a validar
  * @return int 1 si el ID es válido, 0 en caso contrario
  */
-int validateID(int id);
+int validateID(char* id);
 
 
 /**

@@ -42,43 +42,50 @@ void searchAllUsers() {
     pauseScreen();
 }
 
+//============================================================================ REFACTOR URGENTE, CAMBIAR LA LOGICA POR CAMBIO DE ARCHIVO, NO POR ID, YA QUE EL ID ES UN STRING Y NO UN INT.
 
 /**
  * @brief Busca un usuario por su ID.
  * @return void
  */
 void searchUserByID() {
+    char* userID = NULL;
+    int cancelFlag = 0;
+
     do {
         clearScreen();
         searchUserMessage();
 
-        printf("Ingrese el ID del usuario a buscar: ");
-        int userID = validateInt();
+        userID = validateUserInput("Ingrese el ID del usuario a buscar: ", &searchUserMessage, &cancelFlag);
 
-        if (userID == 0) {
-            clearScreen();
+        if (cancelFlag) {
+            free(userID);
             return;
         }
 
         if (validateID(userID) == 0) {
             pauseScreen();
+            free(userID);
             continue;
         }
 
         struct User *user = getUserByID(USERS_FILE_PATH, userID);
 
         if (user == NULL) {
-            printf("Usuario con ID %d no encontrado.\n", userID);
+            printf("Usuario con ID %s no encontrado.\n", userID);
         } else {
             printUser(*user);
-            freeUser(user);
+            freeUserData(user);
             free(user);
         }
 
         pauseScreen();
+        free(userID);
 
-    } while(1);
+    } while(cancelFlag == 0);
 }
+
+// ================================= VALIDAR REFACTOR DE SEARUSER BY ID 
 
 
 
@@ -128,42 +135,44 @@ void searchUserMenu() {
  * @return void
  */
 void addUser() {
-    char *userName = NULL;
-    char *userLastName = NULL;
-    char *userAddress = NULL;
+    char* userID = NULL;
+    char* userName = NULL;
+    char* userLastName = NULL;
+    char* userAddress = NULL;
     int cancelFlag = 0;
 
     do {
         clearScreen();
         addUserMessage();
 
-        printf("Numero de identificacion: ");
-        int userID = validateInt();
+        userID = validateUserInput("Numero de identificacion: ", &addUserMessage, &cancelFlag);
 
-        if (userID == 0) {
+        if (cancelFlag) {
             clearScreen();
             return;
         }
 
         if (validateID(userID) == 0 || existsUser(USERS_FILE_PATH, userID)) {
             pauseScreen();
+            free(userID);
             continue;
         }
 
-        userName = validateUserInput("Nombre: ", &cancelFlag);
+        userName = validateUserInput("Nombre: ", &addUserMessage, &cancelFlag);
 
         if (!cancelFlag) {
-            userLastName = validateUserInput("Apellido: ", &cancelFlag);
+            userLastName = validateUserInput("Apellido: ", &addUserMessage, &cancelFlag);
         }
         
         if (!cancelFlag) {
-            userAddress = validateUserInput("Direccion: ", &cancelFlag);
+            userAddress = validateUserInput("Direccion: ", &addUserMessage, &cancelFlag);
         }
 
         if (cancelFlag) {
-            free(userName);
-            free(userLastName);
-            free(userAddress);
+            if (userID) free(userID);
+            if (userName) free(userName);
+            if (userLastName) free(userLastName);
+            if (userAddress) free(userAddress);
             clearScreen();
             return;
         }
@@ -176,10 +185,14 @@ void addUser() {
             printf("Usuario guardado exitosamente en el archivo JSON.\n");
         }
 
-        freeUser(&newUser);
+        freeUserData(&newUser);
+        free(userID);
+        free(userName);
+        free(userLastName);
+        free(userAddress);
+        
         pauseScreen();
         clearScreen();
-
         return;
 
     } while (1);

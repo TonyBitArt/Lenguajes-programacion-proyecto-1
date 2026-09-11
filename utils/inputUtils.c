@@ -141,19 +141,18 @@ int countDigits(int number) {
  * @param id El ID a validar
  * @return int 1 si el ID es válido, 0 en caso contrario
  */
-int validateID(int id) {
-    if (id < 0) {
+int validateID(char* id) {
+    if (id[0] == '-') {
         printf("Error: El ID no puede ser negativo.\n");
         return 0;
     }
 
-    if (countDigits(id) > 9) {
+    if (strlen(id) > 9) {
         printf("Error: El ID no tiene 9 dígitos.\n");
         return 0;
     }
 
-    int firstDigit = id / 100000000;
-    if (firstDigit < 1 || firstDigit > 9) {
+    if (id[0] < '1' || id[0] > '9') {
         printf("Error: El primer dígito del ID debe estar entre 1 y 9.\n");
         return 0;
     }

@@ -84,7 +84,7 @@ void printUser(struct User user) {
     printf("\n========================================\n");
     printf("          INFORMACIÓN DEL USUARIO\n");
     printf("========================================\n");
-    printf("ID:        %d\n", user.ID);
+    printf("ID:        %s\n", user.ID);
     printf("Nombre:    %s\n", user.name);
     printf("Apellido:  %s\n", user.lastName);
     printf("Dirección: %s\n", user.address);
@@ -116,9 +116,9 @@ void printAllUsers(struct User *users, int userCount) {
  * @param address La dirección del usuario.
  * @return struct User La estructura del nuevo usuario creado.
  */
-struct User createUser(int ID, const char *name, const char *lastName, const char *address) {
+struct User createUser(char* ID, const char *name, const char *lastName, const char *address) {
     struct User newUser;
-    newUser.ID = ID;
+    newUser.ID = strdup(ID);
     newUser.name = strdup(name);
     newUser.lastName = strdup(lastName);
     newUser.address = strdup(address);
@@ -131,8 +131,9 @@ struct User createUser(int ID, const char *name, const char *lastName, const cha
  * @param user Un puntero al usuario a liberar.
  * @return void
  */
-void freeUser(struct User *user) {
+void freeUserData(struct User *user) {
     if (user) {
+        free(user->ID);
         free(user->name);
         free(user->lastName);
         free(user->address);
@@ -148,7 +149,7 @@ void freeUser(struct User *user) {
  */
 void freeAllUsers(struct User *users, int userCount) {
     for (int i = 0; i < userCount; i++) {
-        freeUser(&users[i]);
+        freeUserData(&users[i]);
     }
     free(users);
 }
@@ -157,17 +158,17 @@ void freeAllUsers(struct User *users, int userCount) {
 /**
  * @brief Valida la entrada del usuario.
  * @param message El mensaje a mostrar al usuario.
+ * @param funcion Un puntero a la función que se ejecutará si la entrada es inválida.
  * @param cancelFlag Un puntero a un entero que indica si el usuario desea cancelar.
  * @return char* La entrada del usuario.
  */
-char* validateUserInput(const char* message, int* cancelFlag) {
+char* validateUserInput(const char* message, void (*funcion)(), int* cancelFlag) {
     while(1) {
         printf("%s", message);
         char* input = readInput();
 
         if (input == NULL) {
             printf("Error: No se pudo asignar memoria.\n");
-            pauseScreen();
             *cancelFlag = 1;
             return NULL;
         }
@@ -181,6 +182,8 @@ char* validateUserInput(const char* message, int* cancelFlag) {
         if (isEmptyString(input)) {
             printf("Error: No se puede ingresar un campo vacío.\n");
             pauseScreen();
+            clearScreen();
+            funcion();
             free(input);
             continue;
         }
@@ -190,13 +193,14 @@ char* validateUserInput(const char* message, int* cancelFlag) {
 }
 
 
+
 /**
  * @brief obtiene un usuario por su ID
  * @param path la ruta del archivo donde se encuentra el usuario
  * @param userID el ID del usuario a obtener
  * @return struct User* puntero al usuario encontrado, o NULL si no se encuentra
  */
-struct User* getUserByID(const char *path, int userID) {
+struct User* getUserByID(const char *path, char* userID) {
     int userCount = 0;
     struct User *users = parseUsers(path, &userCount);
     
@@ -205,7 +209,7 @@ struct User* getUserByID(const char *path, int userID) {
     struct User *foundUser = NULL;
 
     for (int i = 0; i < userCount; i++) {
-        if (users[i].ID == userID && foundUser == NULL) {
+        if (users[i].ID != NULL && strcmp(users[i].ID, userID) == 0 && foundUser == NULL) {
             foundUser = malloc(sizeof(struct User));
             
             if (foundUser) {
@@ -214,7 +218,7 @@ struct User* getUserByID(const char *path, int userID) {
             }
         }
         
-        freeUser(&users[i]);
+        freeUserData(&users[i]);
     }
     
     free(users);
@@ -244,7 +248,7 @@ int saveUser(const char *path, struct User newUser) {
 
     cJSON_AddStringToObject(userObject, "name", newUser.name);
     cJSON_AddStringToObject(userObject, "lastName", newUser.lastName);
-    cJSON_AddNumberToObject(userObject, "ID", newUser.ID);
+    cJSON_AddStringToObject(userObject, "ID", newUser.ID);
     cJSON_AddStringToObject(userObject, "address", newUser.address);
 
 
@@ -256,11 +260,12 @@ int saveUser(const char *path, struct User newUser) {
 }
 
 
-int existsUser(const char *path, int id) {
+
+int existsUser(const char *path, char* id) {
     struct User *user = getUserByID(path, id);
     
     if (user != NULL) {
-        freeUser(user);
+        freeUserData(user);
         free(user);
 
         printf("Error: El ID ya existe en el sistema.\n");
