@@ -1,8 +1,41 @@
 [{
     "loanID": 1,
-    "user": "Juan Perez",
+    "userID": "123456789",
     "bookName": "Cien años de soledad",
-    "bookID": 1,
+    "bookCopyNumber": 1,
     "loanDate": "2026-09-1",
     "returnDate": "2026-09-15"
-}]
+},
+{
+    "loanID": 2,
+    "userID": "987654321",
+    "bookName": "Don Quijote de la Mancha",
+    "bookCopyNumber": 1,
+    "loanDate": "2026-10-10",
+    "returnDate": "2026-11-25"
+},
+{
+    "loanID": 3,
+    "userID": "123456789",
+    "bookName": "La sombra del viento",
+    "bookCopyNumber": 1,
+    "loanDate": "2026-09-5",
+    "returnDate": "2026-09-20"
+},
+{
+    "loanID": 4,
+    "userID": "123456789",
+    "bookName": "Cien años de soledad",
+    "bookCopyNumber": 2,
+    "loanDate": "2026-09-12",
+    "returnDate": "2026-09-27"
+},
+{
+    "loanID": 5,
+    "userID": "987654321",
+    "bookName": "Ficciones",
+    "bookCopyNumber": 1,
+    "loanDate": "2026-09-8",
+    "returnDate": "2026-09-23"
+}
+]

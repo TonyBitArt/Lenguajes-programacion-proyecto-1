@@ -1,18 +1,14 @@
 #ifndef JSONHANDLER_H
 #define JSONHANDLER_H
 
-
-// Includes de los archivos de cabecera del proyecto
 #include "../cJSON/cJSON.h"
-
 
 struct User {
     char *name;
     char *lastName;
-    int ID;
+    char *ID;
     char *address;
 };
-
 
 struct Book {
     char *name;
@@ -23,16 +19,14 @@ struct Book {
     int quantity;
 };
 
-
 struct Loan {
     int loanID;
-    char *user;
+    char *userID;
     char *bookName;
-    int bookID;
+    int bookCopyNumber;
     char *loanDate;
     char *returnDate;
 };
-
 
 /**
  * @brief Lee un archivo y devuelve su contenido como una cadena de caracteres.
@@ -40,7 +34,6 @@ struct Loan {
  * @return char* Una cadena de caracteres que contiene el contenido del archivo. NULL si ocurre un error.
  */
 char *readFile(const char *path);
-
 
 /**
  * @brief Parsea un archivo JSON y devuelve un array de estructuras User.
@@ -50,7 +43,6 @@ char *readFile(const char *path);
  */
 struct User *parseUsers(const char *path, int *userCount);
 
-
 /**
  * @brief Parsea un archivo JSON y devuelve un array de estructuras Book.
  * @param path La ruta del archivo JSON a parsear.
@@ -58,7 +50,6 @@ struct User *parseUsers(const char *path, int *userCount);
  * @return struct Book* Un array de estructuras Book. NULL si ocurre un error.
  */
 struct Book *parseBooks(const char *path, int *bookCount);
-
 
 /**
  * @brief Parsea un archivo JSON y devuelve un array de estructuras Loan.
@@ -68,13 +59,13 @@ struct Book *parseBooks(const char *path, int *bookCount);
  */
 struct Loan *parseLoans(const char *path, int *loanCount);
 
-
 /**
  * @brief Parsea un archivo JSON y devuelve un objeto cJSON.
  * @param path La ruta del archivo JSON a parsear.
  * @return cJSON* Un objeto cJSON. NULL si ocurre un error.
  */
 cJSON *parseJsonFile(const char *path);
+
 
 
 /**
