@@ -140,3 +140,44 @@ struct Loan *parseLoans(const char *path, int *loanCount){
     return loans;
 }
 
+/**
+ * @brief Obtiene todos los usuarios de un archivo JSON.
+ * @param path La ruta del archivo JSON.
+ * @param users Un puntero a un array de estructuras User.
+ * @param userCount Un puntero a un entero que se llenará con el número de usuarios en el archivo.
+ * @return struct User* Un array de estructuras User. NULL si ocurre un error.
+ */
+struct User* getAllUsers(const char *path, struct User **users, int *userCount) {
+    *users = parseUsers(path, userCount);
+    return *users;
+}
+
+
+/**
+ * @brief guarda un objeto JSON en un archivo
+ * @param path la ruta del archivo donde se guardará el JSON
+ * @param jsonObject el objeto JSON a guardar
+ * @return int 1 si se guardó exitosamente, 0 si ocurrió un error
+ */
+int saveJsonToFile(const char *path, cJSON *jsonObject) {
+    if (!jsonObject) {
+        return 0;
+    }
+
+    char *jsonString = cJSON_Print(jsonObject);
+    if (!jsonString) {
+        return 0;
+    }
+
+    FILE *file = fopen(path, "wb");
+    if (!file) {
+        free(jsonString);
+        return 0;
+    }
+
+    fwrite(jsonString, sizeof(char), strlen(jsonString), file);
+    fclose(file);
+
+    free(jsonString);
+    return 1;
+}
