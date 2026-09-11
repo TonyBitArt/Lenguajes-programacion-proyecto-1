@@ -1,10 +1,12 @@
 #ifndef JSONHANDLER_H
 #define JSONHANDLER_H
 
+#include "../cJSON/cJSON.h"
+
 struct User {
     char *name;
     char *lastName;
-    int ID;
+    char *ID;
     char *address;
 };
 
@@ -19,9 +21,9 @@ struct Book {
 
 struct Loan {
     int loanID;
-    char *user;
+    char *userID;
     char *bookName;
-    int bookID;
+    int bookCopyNumber;
     char *loanDate;
     char *returnDate;
 };
