@@ -1,0 +1,8 @@
+[{
+    "loanID": 1,
+    "user": "Juan Perez",
+    "bookName": "Cien años de soledad",
+    "bookID": 1,
+    "loanDate": "2026-09-1",
+    "returnDate": "2026-09-15"
+}]
