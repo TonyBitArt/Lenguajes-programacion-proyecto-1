@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "../cJSON/cJSON.h"
 #include "../headers/jsonHandler.h"
 
@@ -61,10 +62,10 @@ struct User *parseUsers(const char *path, int *userCount) {
         cJSON *IDJson = cJSON_GetObjectItem(userJson, "ID");
         cJSON *addressJson = cJSON_GetObjectItem(userJson, "address");
 
-        users[i].name = nameJson ? nameJson->valuestring : NULL;
-        users[i].lastName = lastNameJson ? lastNameJson->valuestring : NULL;
-        users[i].ID = IDJson ? IDJson->valueint : 0;
-        users[i].address = addressJson ? addressJson->valuestring : NULL;
+        users[i].name = nameJson && nameJson->valuestring ? strdup(nameJson->valuestring) : NULL;
+        users[i].lastName = lastNameJson && lastNameJson->valuestring ? strdup(lastNameJson->valuestring) : NULL;
+        users[i].ID = IDJson && IDJson->valuestring ? strdup(IDJson->valuestring) : NULL;
+        users[i].address = addressJson && addressJson->valuestring ? strdup(addressJson->valuestring) : NULL;
     }
     cJSON_Delete(usersJson);
     return users;
@@ -93,11 +94,11 @@ struct Book *parseBooks(const char *path, int *bookCount) {
         cJSON *summaryJson = cJSON_GetObjectItem(bookJson, "summary");
         cJSON *quantityJson = cJSON_GetObjectItem(bookJson, "quantity");
 
-        books[i].name = nameJson ? nameJson->valuestring : NULL;
-        books[i].author = authorJson ? authorJson->valuestring : NULL;
+        books[i].name = nameJson && nameJson->valuestring ? strdup(nameJson->valuestring) : NULL;
+        books[i].author = authorJson && authorJson->valuestring ? strdup(authorJson->valuestring) : NULL;
         books[i].year = yearJson ? yearJson->valueint : 0;
-        books[i].genre = genreJson ? genreJson->valuestring : NULL;
-        books[i].summary = summaryJson ? summaryJson->valuestring : NULL;
+        books[i].genre = genreJson && genreJson->valuestring ? strdup(genreJson->valuestring) : NULL;
+        books[i].summary = summaryJson && summaryJson->valuestring ? strdup(summaryJson->valuestring) : NULL;
         books[i].quantity = quantityJson ? quantityJson->valueint : 0;
     }
     cJSON_Delete(booksJson);
@@ -122,18 +123,18 @@ struct Loan *parseLoans(const char *path, int *loanCount){
         if (!loanJson) continue;
 
         cJSON *loanIDJson = cJSON_GetObjectItem(loanJson, "loanID");
-        cJSON *userJson = cJSON_GetObjectItem(loanJson, "user");
+        cJSON *userIDJson = cJSON_GetObjectItem(loanJson, "userID");
         cJSON *bookNameJson = cJSON_GetObjectItem(loanJson, "bookName");
-        cJSON *bookIDJson = cJSON_GetObjectItem(loanJson, "bookID");
+        cJSON *bookCopyNumberJson = cJSON_GetObjectItem(loanJson, "bookCopyNumber");
         cJSON *loanDateJson = cJSON_GetObjectItem(loanJson, "loanDate");
         cJSON *returnDateJson = cJSON_GetObjectItem(loanJson, "returnDate");
 
         loans[i].loanID = loanIDJson ? loanIDJson->valueint : 0;
-        loans[i].user = userJson ? userJson->valuestring : NULL;
-        loans[i].bookName = bookNameJson ? bookNameJson->valuestring : NULL;
-        loans[i].bookID = bookIDJson ? bookIDJson->valueint : 0;
-        loans[i].loanDate = loanDateJson ? loanDateJson->valuestring : NULL;
-        loans[i].returnDate = returnDateJson ? returnDateJson->valuestring : NULL;
+        loans[i].userID = userIDJson && userIDJson->valuestring ? strdup(userIDJson->valuestring) : NULL;
+        loans[i].bookName = bookNameJson && bookNameJson->valuestring ? strdup(bookNameJson->valuestring) : NULL;
+        loans[i].bookCopyNumber = bookCopyNumberJson ? bookCopyNumberJson->valueint : 0;
+        loans[i].loanDate = loanDateJson && loanDateJson->valuestring ? strdup(loanDateJson->valuestring) : NULL;
+        loans[i].returnDate = returnDateJson && returnDateJson->valuestring ? strdup(returnDateJson->valuestring) : NULL;
     }
     cJSON_Delete(loansJson);
     return loans;
