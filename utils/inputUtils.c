@@ -1,9 +1,12 @@
+// Includes de la librería estándar
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "../headers/inputUtils.h"
 
+
+// Includes de los archivos de cabecera del proyecto
+#include "../headers/inputUtils.h"
 
 /**
  * @brief Lee una línea de texto ingresada por el usuario.
@@ -155,35 +158,5 @@ int validateID(int id) {
         return 0;
     }
 
-    return 1;
-}
-
-
-/**
- * @brief Guarda un objeto JSON en un archivo.
- * @param path La ruta del archivo donde se guardará el JSON.
- * @param jsonObject El objeto JSON a guardar.
- * @return int 1 si se guardó exitosamente, 0 si ocurrió un error.
- */
-int saveJsonToFile(const char *path, cJSON *jsonObject) {
-    if (!jsonObject) {
-        return 0;
-    }
-
-    char *jsonString = cJSON_Print(jsonObject);
-    if (!jsonString) {
-        return 0;
-    }
-
-    FILE *file = fopen(path, "wb");
-    if (!file) {
-        free(jsonString);
-        return 0;
-    }
-
-    fwrite(jsonString, sizeof(char), strlen(jsonString), file);
-    fclose(file);
-
-    free(jsonString);
     return 1;
 }

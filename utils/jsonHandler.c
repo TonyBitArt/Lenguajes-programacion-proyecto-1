@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "../cJSON/cJSON.h"
 #include "../headers/jsonHandler.h"
-#include "../headers/inputUtils.h"
+
 
 char *readFile(const char *path) {
     FILE *file = fopen(path, "rb"); // Abrir el archivo en modo lectura/binario
@@ -62,10 +63,11 @@ struct User *parseUsers(const char *path, int *userCount) {
         cJSON *IDJson = cJSON_GetObjectItem(userJson, "ID");
         cJSON *addressJson = cJSON_GetObjectItem(userJson, "address");
 
-        users[i].name = nameJson ? nameJson->valuestring : NULL;
-        users[i].lastName = lastNameJson ? lastNameJson->valuestring : NULL;
+        // ... (dentro del ciclo for en parseUsers)
+        users[i].name = nameJson ? strdup(nameJson->valuestring) : NULL;
+        users[i].lastName = lastNameJson ? strdup(lastNameJson->valuestring) : NULL;
         users[i].ID = IDJson ? IDJson->valueint : 0;
-        users[i].address = addressJson ? addressJson->valuestring : NULL;
+        users[i].address = addressJson ? strdup(addressJson->valuestring) : NULL;
     }
     cJSON_Delete(usersJson);
     return users;
@@ -142,34 +144,43 @@ struct Loan *parseLoans(const char *path, int *loanCount){
 
 
 /**
- * @brief Guarda un nuevo usuario en un archivo JSON.
- * @param path La ruta del archivo JSON donde se guardará el usuario.
- * @param newUser La estructura User que contiene los datos del nuevo usuario.
- * @return int 1 si el usuario se guardó exitosamente, 0 si ocurrió un error.
+ * @brief Obtiene todos los usuarios de un archivo JSON.
+ * @param path La ruta del archivo JSON.
+ * @param users Un puntero a un array de estructuras User.
+ * @param userCount Un puntero a un entero que se llenará con el número de usuarios en el archivo.
+ * @return struct User* Un array de estructuras User. NULL si ocurre un error.
  */
-int saveUser(const char *path, struct User newUser) {
-    cJSON *usersArray = parseJsonFile(path);
-    
-    if (!usersArray) {
-        usersArray = cJSON_CreateArray();
-    }
+struct User* getAllUsers(const char *path, struct User **users, int *userCount) {
+    *users = parseUsers(path, userCount);
+    return *users;
+}
 
-    cJSON *userObject = cJSON_CreateObject();
 
-    if (!userObject) {
-        cJSON_Delete(usersArray);
+/**
+ * @brief guarda un objeto JSON en un archivo
+ * @param path la ruta del archivo donde se guardará el JSON
+ * @param jsonObject el objeto JSON a guardar
+ * @return int 1 si se guardó exitosamente, 0 si ocurrió un error
+ */
+int saveJsonToFile(const char *path, cJSON *jsonObject) {
+    if (!jsonObject) {
         return 0;
     }
 
-    cJSON_AddStringToObject(userObject, "name", newUser.name);
-    cJSON_AddStringToObject(userObject, "lastName", newUser.lastName);
-    cJSON_AddNumberToObject(userObject, "ID", newUser.ID);
-    cJSON_AddStringToObject(userObject, "address", newUser.address);
+    char *jsonString = cJSON_Print(jsonObject);
+    if (!jsonString) {
+        return 0;
+    }
 
-    
-    cJSON_AddItemToArray(usersArray, userObject);
-    int success = saveJsonToFile(path, usersArray);
+    FILE *file = fopen(path, "wb");
+    if (!file) {
+        free(jsonString);
+        return 0;
+    }
 
-    cJSON_Delete(usersArray);
-    return success; 
+    fwrite(jsonString, sizeof(char), strlen(jsonString), file);
+    fclose(file);
+
+    free(jsonString);
+    return 1;
 }
