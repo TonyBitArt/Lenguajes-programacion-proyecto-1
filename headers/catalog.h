@@ -1,16 +1,6 @@
 #ifndef CATALOG_H
 #define CATALOG_H
 
-/* estructura que van a tener los elementos del catálogo */
-typedef struct Book {
-    char *name;         // nombre de la obra
-    char *author;       // nombre del autor
-    int year;           // año de publicación
-    char *genre;        // género literario
-    char *summary;      // resumen de la obra
-    int quantity;       // cantidad en inventario
-} Book;
-
 /* macros del preprocesador para las opciones del catálogo */
 #define CATALOG_MENU_VIEW 1
 #define CATALOG_MENU_ADD 2
