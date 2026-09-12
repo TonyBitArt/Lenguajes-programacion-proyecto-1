@@ -8,6 +8,7 @@
 // Includes de los archivos de cabecera del proyecto
 #include "../headers/inputUtils.h"
 
+
 /**
  * @brief Lee una línea de texto ingresada por el usuario.
  * Lee los caracteres uno por uno y almacena la entrada en memoria
@@ -16,9 +17,9 @@
  * @return char* Cadena ingresada terminada en '\0', o NULL si
  * ocurre un error de memoria.
  */
-char *readInput(void) {
-    char *input = NULL;
-    char *temp;
+char* readInput(void) {
+    char* input = NULL;
+    char* temp;
     int size = 0;
     int character;
 
@@ -119,41 +120,22 @@ void pauseScreen() {
 
 
 /**
- * @brief Cuenta la cantidad de dígitos en un número entero
- * @param number El número del cual contar los dígitos
- * @return int la cantidad de dígitos en el número
- */
-int countDigits(int number) {
-    if (number == 0) return 1;
-    
-    int count = 0;
-    while (number != 0) {
-        number /= 10;
-        count++;
-    }
-
-    return count;
-}
-
-
-/**
  * @brief Valida si un ID es válido
  * @param id El ID a validar
  * @return int 1 si el ID es válido, 0 en caso contrario
  */
-int validateID(int id) {
-    if (id < 0) {
+int validateID(char* id) {
+    if (id[0] == '-') {
         printf("Error: El ID no puede ser negativo.\n");
         return 0;
     }
 
-    if (countDigits(id) > 9) {
+    if (strlen(id) > 9) {
         printf("Error: El ID no tiene 9 dígitos.\n");
         return 0;
     }
 
-    int firstDigit = id / 100000000;
-    if (firstDigit < 1 || firstDigit > 9) {
+    if (id[0] < '1' || id[0] > '9') {
         printf("Error: El primer dígito del ID debe estar entre 1 y 9.\n");
         return 0;
     }
