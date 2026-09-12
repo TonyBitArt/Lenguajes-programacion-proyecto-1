@@ -142,18 +142,6 @@ struct Loan *parseLoans(const char *path, int *loanCount){
 }
 
 /**
- * @brief Obtiene todos los usuarios de un archivo JSON.
- * @param path La ruta del archivo JSON.
- * @param users Un puntero a un array de estructuras User.
- * @param userCount Un puntero a un entero que se llenará con el número de usuarios en el archivo.
- * @return struct User* Un array de estructuras User. NULL si ocurre un error.
- */
-struct User* getAllUsers(const char *path, struct User **users, int *userCount) {
-    *users = parseUsers(path, userCount);
-    return *users;
-}
-
-/**
  * @brief guarda un objeto JSON en un archivo
  * @param path la ruta del archivo donde se guardará el JSON
  * @param jsonObject el objeto JSON a guardar
