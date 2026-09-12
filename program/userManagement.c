@@ -23,7 +23,7 @@
  * @return void
  */
 void searchAllUsers() {
-    struct User *users = NULL;
+    struct User* users = NULL;
     int userCount = 0;
 
     if (!getAllUsers(USERS_FILE_PATH, &users, &userCount)) {
@@ -42,7 +42,6 @@ void searchAllUsers() {
     pauseScreen();
 }
 
-//============================================================================ REFACTOR URGENTE, CAMBIAR LA LOGICA POR CAMBIO DE ARCHIVO, NO POR ID, YA QUE EL ID ES UN STRING Y NO UN INT.
 
 /**
  * @brief Busca un usuario por su ID.
@@ -69,7 +68,7 @@ void searchUserByID() {
             continue;
         }
 
-        struct User *user = getUserByID(USERS_FILE_PATH, userID);
+        struct User* user = getUserByID(USERS_FILE_PATH, userID);
 
         if (user == NULL) {
             printf("Usuario con ID %s no encontrado.\n", userID);
@@ -84,9 +83,6 @@ void searchUserByID() {
 
     } while(cancelFlag == 0);
 }
-
-// ================================= VALIDAR REFACTOR DE SEARUSER BY ID 
-
 
 
 /**
@@ -190,7 +186,7 @@ void addUser() {
         free(userName);
         free(userLastName);
         free(userAddress);
-        
+
         pauseScreen();
         clearScreen();
         return;
@@ -200,7 +196,106 @@ void addUser() {
 
 
 /**
- * @brief Muestra las opciones de gestión de usuarios.
+ * @brief Modifica un usuario existente en el sistema.
+ * Solicita al usuario que ingrese el ID del usuario a modificar y los nuevos datos.
+ * 
+ * @return void
+ */
+void modifyUser() {
+    char* userID = NULL;
+    int cancelFlag = 0;
+
+    do {
+        clearScreen();
+        printModifyUserMessage();
+
+        userID = validateUserInput("Ingrese el ID del usuario a modificar: ", &printModifyUserMessage, &cancelFlag);
+
+        if (cancelFlag) {
+            free(userID);
+            return;
+        }
+
+        if (validateID(userID) == 0) {
+            pauseScreen();
+            free(userID);
+            continue;
+        }
+
+        struct User* user = getUserByID(USERS_FILE_PATH, userID);
+
+        if (user == NULL) {
+            printf("Usuario con ID %s no encontrado.\n", userID);
+            pauseScreen();
+            clearScreen();
+            free(user);
+            continue;
+        }
+
+        modifyUserData(USERS_FILE_PATH, user);
+        free(user);
+        return;
+
+    } while(cancelFlag == 0);
+}
+
+
+/**
+ * @brief Elimina un usuario existente en el sistema.
+ * Solicita al usuario que ingrese el ID del usuario a eliminar y lo elimina del archivo JSON.
+ * 
+ * @return void
+ */
+void deleteUser() {
+    char* userID = NULL;
+    int cancelFlag = 0;
+
+    do {
+        clearScreen();
+        printDeleteUserMessage();
+
+        userID = validateUserInput("Ingrese el ID del usuario a eliminar: ", &printDeleteUserMessage, &cancelFlag);
+
+        if (cancelFlag) {
+            free(userID);
+            return;
+        }
+
+        if (validateID(userID) == 0) {
+            pauseScreen();
+            free(userID);
+            continue;
+        }
+
+        struct User* user = getUserByID(USERS_FILE_PATH, userID);
+
+        if (user == NULL) {
+            printf("Usuario con ID %s no encontrado.\n", userID);
+            pauseScreen();
+            clearScreen();
+            free(user);
+            continue;
+        }
+
+        if (!deleteUserByID(USERS_FILE_PATH, userID)) {
+            printf("Error: No se pudo eliminar el usuario del archivo JSON.\n");
+        } else {
+            printf("Usuario eliminado exitosamente del archivo JSON.\n");
+        }
+
+        free(user);
+        free(userID);
+        pauseScreen();
+        clearScreen();
+        return;
+
+    } while(cancelFlag == 0);
+}
+
+
+/**
+ * @brief Muestra el menú de opciones de gestión de usuarios y maneja la interacción del usuario.
+ * @return void
  */
 void userOptions() {
     do {
@@ -224,11 +319,11 @@ void userOptions() {
                 break;
 
             case 3:
-                printf("selecciono la opcion modificar usuarios");
+                modifyUser();
                 break;
             
             case 4:
-                printf("selecciono la opcion ver usuarios");
+                deleteUser();
                 break;
 
             case 5:

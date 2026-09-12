@@ -8,6 +8,7 @@
 // Includes de los archivos de cabecera del proyecto
 #include "../headers/inputUtils.h"
 
+
 /**
  * @brief Lee una línea de texto ingresada por el usuario.
  * Lee los caracteres uno por uno y almacena la entrada en memoria
@@ -16,9 +17,9 @@
  * @return char* Cadena ingresada terminada en '\0', o NULL si
  * ocurre un error de memoria.
  */
-char *readInput(void) {
-    char *input = NULL;
-    char *temp;
+char* readInput(void) {
+    char* input = NULL;
+    char* temp;
     int size = 0;
     int character;
 
@@ -115,24 +116,6 @@ void clearScreen() {
 void pauseScreen() {
     printf("Presione Enter para continuar: ");
     free(readInput());
-}
-
-
-/**
- * @brief Cuenta la cantidad de dígitos en un número entero
- * @param number El número del cual contar los dígitos
- * @return int la cantidad de dígitos en el número
- */
-int countDigits(int number) {
-    if (number == 0) return 1;
-    
-    int count = 0;
-    while (number != 0) {
-        number /= 10;
-        count++;
-    }
-
-    return count;
 }
 
 

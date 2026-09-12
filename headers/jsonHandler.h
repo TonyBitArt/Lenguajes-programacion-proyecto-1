@@ -1,6 +1,7 @@
 #ifndef JSONHANDLER_H
 #define JSONHANDLER_H
 
+
 #include "../cJSON/cJSON.h"
 
 struct User {
@@ -9,6 +10,7 @@ struct User {
     char *ID;
     char *address;
 };
+
 
 struct Book {
     char *name;
@@ -19,6 +21,7 @@ struct Book {
     int quantity;
 };
 
+
 struct Loan {
     int loanID;
     char *userID;
@@ -28,12 +31,14 @@ struct Loan {
     char *returnDate;
 };
 
+
 /**
  * @brief Lee un archivo y devuelve su contenido como una cadena de caracteres.
  * @param path La ruta del archivo a leer.
  * @return char* Una cadena de caracteres que contiene el contenido del archivo. NULL si ocurre un error.
  */
-char *readFile(const char *path);
+char* readFile(const char *path);
+
 
 /**
  * @brief Parsea un archivo JSON y devuelve un array de estructuras User.
@@ -43,6 +48,7 @@ char *readFile(const char *path);
  */
 struct User *parseUsers(const char *path, int *userCount);
 
+
 /**
  * @brief Parsea un archivo JSON y devuelve un array de estructuras Book.
  * @param path La ruta del archivo JSON a parsear.
@@ -50,6 +56,7 @@ struct User *parseUsers(const char *path, int *userCount);
  * @return struct Book* Un array de estructuras Book. NULL si ocurre un error.
  */
 struct Book *parseBooks(const char *path, int *bookCount);
+
 
 /**
  * @brief Parsea un archivo JSON y devuelve un array de estructuras Loan.
@@ -59,23 +66,13 @@ struct Book *parseBooks(const char *path, int *bookCount);
  */
 struct Loan *parseLoans(const char *path, int *loanCount);
 
+
 /**
  * @brief Parsea un archivo JSON y devuelve un objeto cJSON.
  * @param path La ruta del archivo JSON a parsear.
  * @return cJSON* Un objeto cJSON. NULL si ocurre un error.
  */
 cJSON *parseJsonFile(const char *path);
-
-
-
-/**
- * @brief Obtiene todos los usuarios de un archivo JSON.
- * @param path La ruta del archivo JSON.
- * @param users Un puntero a un array de estructuras User.
- * @param userCount Un puntero a un entero que se llenará con el número de usuarios en el archivo.
- * @return struct User* Un array de estructuras User. NULL si ocurre un error.
- */
-struct User* getAllUsers(const char *path, struct User **users, int *userCount);
 
 
 /**

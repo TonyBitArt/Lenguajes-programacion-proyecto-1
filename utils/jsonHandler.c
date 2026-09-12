@@ -1,10 +1,20 @@
+// Includes de la librería estándar
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+
+// Includes de los archivos de cabecera del proyecto
 #include "../cJSON/cJSON.h"
 #include "../headers/jsonHandler.h"
 
-char *readFile(const char *path) {
+
+/**
+ * @brief Lee un archivo y devuelve su contenido como una cadena de caracteres.
+ * @param path La ruta del archivo a leer.
+ * @return char* Una cadena de caracteres que contiene el contenido del archivo. NULL si ocurre un error.
+ */
+char* readFile(const char *path) {
     FILE *file = fopen(path, "rb"); // Abrir el archivo en modo lectura/binario
     if (!file) return NULL;
 
@@ -24,6 +34,7 @@ char *readFile(const char *path) {
     return bufer;
 }
 
+
 cJSON *parseJsonFile(const char *path) {
     char *jsonString = readFile(path);
     if (!jsonString) {
@@ -36,6 +47,7 @@ cJSON *parseJsonFile(const char *path) {
     return json;
 
 }
+
 
 struct User *parseUsers(const char *path, int *userCount) {
     cJSON *usersJson = parseJsonFile(path);
@@ -70,6 +82,7 @@ struct User *parseUsers(const char *path, int *userCount) {
     cJSON_Delete(usersJson);
     return users;
 }
+
 
 struct Book *parseBooks(const char *path, int *bookCount) {
     cJSON *booksJson = parseJsonFile(path);
@@ -106,6 +119,7 @@ struct Book *parseBooks(const char *path, int *bookCount) {
 
 }
 
+
 struct Loan *parseLoans(const char *path, int *loanCount){
     cJSON *loansJson = parseJsonFile(path);
     if (!loansJson) return NULL;
@@ -140,18 +154,6 @@ struct Loan *parseLoans(const char *path, int *loanCount){
     return loans;
 }
 
-/**
- * @brief Obtiene todos los usuarios de un archivo JSON.
- * @param path La ruta del archivo JSON.
- * @param users Un puntero a un array de estructuras User.
- * @param userCount Un puntero a un entero que se llenará con el número de usuarios en el archivo.
- * @return struct User* Un array de estructuras User. NULL si ocurre un error.
- */
-struct User* getAllUsers(const char *path, struct User **users, int *userCount) {
-    *users = parseUsers(path, userCount);
-    return *users;
-}
-
 
 /**
  * @brief guarda un objeto JSON en un archivo
@@ -159,17 +161,17 @@ struct User* getAllUsers(const char *path, struct User **users, int *userCount) 
  * @param jsonObject el objeto JSON a guardar
  * @return int 1 si se guardó exitosamente, 0 si ocurrió un error
  */
-int saveJsonToFile(const char *path, cJSON *jsonObject) {
+int saveJsonToFile(const char* path, cJSON* jsonObject) {
     if (!jsonObject) {
         return 0;
     }
 
-    char *jsonString = cJSON_Print(jsonObject);
+    char* jsonString = cJSON_Print(jsonObject);
     if (!jsonString) {
         return 0;
     }
 
-    FILE *file = fopen(path, "wb");
+    FILE* file = fopen(path, "wb");
     if (!file) {
         free(jsonString);
         return 0;

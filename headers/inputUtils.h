@@ -6,7 +6,7 @@
  * @brief lee una línea de texto ingresada por el usuario
  * @return char* puntero a la cadena terminada en '\0', o NULL en caso de que de error
  */
-char *readInput(void);
+char* readInput(void);
 
 /**
  * @brief lee una entrada y valida que sea un número entero
@@ -40,14 +40,6 @@ void pauseScreen();
  * @return int 1 si el ID es válido, 0 en caso contrario
  */
 int validateID(char* id);
-
-
-/**
- * @brief cuenta la cantidad de dígitos en un número entero
- * @param number el número del cual contar los dígitos
- * @return int la cantidad de dígitos en el número
- */
-int countDigits(int number);
 
 
 #endif
