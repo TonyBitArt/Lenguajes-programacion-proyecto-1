@@ -129,6 +129,8 @@ struct Loan *parseLoans(const char *path, int *loanCount){
         cJSON *bookCopyNumberJson = cJSON_GetObjectItem(loanJson, "bookCopyNumber");
         cJSON *loanDateJson = cJSON_GetObjectItem(loanJson, "loanDate");
         cJSON *returnDateJson = cJSON_GetObjectItem(loanJson, "returnDate");
+        cJSON *actualReturnDateJson = cJSON_GetObjectItem(loanJson, "actualReturnDate");
+        cJSON *statusJson = cJSON_GetObjectItem(loanJson, "status");
 
         loans[i].loanID = loanIDJson ? loanIDJson->valueint : 0;
         loans[i].userID = userIDJson && userIDJson->valuestring ? strdup(userIDJson->valuestring) : NULL;
@@ -136,6 +138,8 @@ struct Loan *parseLoans(const char *path, int *loanCount){
         loans[i].bookCopyNumber = bookCopyNumberJson ? bookCopyNumberJson->valueint : 0;
         loans[i].loanDate = loanDateJson && loanDateJson->valuestring ? strdup(loanDateJson->valuestring) : NULL;
         loans[i].returnDate = returnDateJson && returnDateJson->valuestring ? strdup(returnDateJson->valuestring) : NULL;
+        loans[i].actualReturnDate = actualReturnDateJson && actualReturnDateJson->valuestring ? strdup(actualReturnDateJson->valuestring) : NULL;
+        loans[i].status = statusJson && statusJson->valuestring ? strdup(statusJson->valuestring) : NULL;
     }
     cJSON_Delete(loansJson);
     return loans;

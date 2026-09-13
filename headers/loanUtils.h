@@ -25,4 +25,12 @@ int saveLoan(struct Loan *loan);
  */
 int getNextCopyNumber(char *bookName);
 
+/**
+ * @brief Guarda todos los préstamos en el archivo JSON de préstamos.
+ * @param loans Puntero al arreglo de préstamos.
+ * @param loanCount Cantidad de préstamos en el arreglo.
+ * @return void
+ */
+void saveAllLoans(struct Loan *loans, int loanCount);
+
 #endif // LOANUTILS_H

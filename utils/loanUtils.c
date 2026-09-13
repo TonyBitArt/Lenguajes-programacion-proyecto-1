@@ -9,6 +9,8 @@ void freeAllLoans(struct Loan *loans, int loanCount) {
         free(loans[i].bookName);
         free(loans[i].loanDate);
         free(loans[i].returnDate);
+        free(loans[i].actualReturnDate);
+        free(loans[i].status);
     }
     free(loans);
 }
@@ -70,4 +72,29 @@ int getNextCopyNumber(char *bookName) {
 
     freeAllLoans(loans, loanCount);
     return maxCopyNumber + 1; // Retorna el siguiente número de copia disponible
+}
+
+void saveAllLoans(struct Loan *loans, int loanCount) {
+    cJSON *loansArray = cJSON_CreateArray();
+
+    for (int i = 0; i < loanCount; i++) {
+        cJSON *loanObject = cJSON_CreateObject();
+        cJSON_AddNumberToObject(loanObject, "loanID", loans[i].loanID);
+        cJSON_AddStringToObject(loanObject, "userID", loans[i].userID);
+        cJSON_AddStringToObject(loanObject, "bookName", loans[i].bookName);
+        cJSON_AddNumberToObject(loanObject, "bookCopyNumber", loans[i].bookCopyNumber);
+        cJSON_AddStringToObject(loanObject, "loanDate", loans[i].loanDate);
+        cJSON_AddStringToObject(loanObject, "returnDate", loans[i].returnDate);
+        if (loans[i].actualReturnDate) {
+            cJSON_AddStringToObject(loanObject, "actualReturnDate", loans[i].actualReturnDate);
+        }
+        if (loans[i].status) {
+            cJSON_AddStringToObject(loanObject, "status", loans[i].status);
+        }
+
+        cJSON_AddItemToArray(loansArray, loanObject);
+    }
+
+    saveJsonToFile("./data/loans.json", loansArray);
+    cJSON_Delete(loansArray);
 }

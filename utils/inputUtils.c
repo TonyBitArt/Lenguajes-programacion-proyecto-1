@@ -6,6 +6,7 @@
 
 
 // Includes de los archivos de cabecera del proyecto
+#include "../headers/jsonHandler.h"
 #include "../headers/inputUtils.h"
 
 
@@ -228,4 +229,54 @@ void printCell(const char* text, int width){
     }
 
     printf(" |");
+}
+
+int parseYearMonth(const char *date, int *year, int *month) {
+    if (!date) return -1;
+    int y, m, d;
+    if (sscanf(date, "%d-%d-%d", &y, &m, &d) != 3) return -1;
+    *year = y;
+    *month = m;
+    return 0;
+}
+
+int dailyRate(int days) {
+    if (days >= 1 && days <= 7) return 175;
+    if (days >= 8 && days <= 15) return 150;
+    return 100; /* 16 dias o mas */
+}
+
+int dailyRateWithPenalty(int days) {
+    if (days >= 1 && days <= 7) return 100;
+    if (days >= 8 && days <= 15) return 75;
+    return 50; /* 16 dias o mas */  
+}
+
+int loanAmount(struct Loan *loan) {
+
+    int loanAmount = 0;
+
+    // Calcular tarifa diaria normal
+
+    long start = parseDays(loan->loanDate);
+    long end = parseDays(loan->returnDate);
+
+    if (start < 0 || end < 0) return 0;
+    int days = (int)(end - start);
+    if (days < 1) days = 1; // prestamos del mismo dia cuentan como 1 dia
+    loanAmount += days * dailyRate(days);
+
+    // Calcular tarifa diaria con penalización si el libro fue devuelto tarde
+
+    if (loan->actualReturnDate) {
+        start = parseDays(loan->returnDate);
+        end = parseDays(loan->actualReturnDate);
+
+        if (start < 0 || end < 0) return loanAmount;
+        days = (int)(end - start);
+        if (days > 0) {
+            loanAmount += days * dailyRateWithPenalty(days);
+        }
+    }
+    return loanAmount;
 }

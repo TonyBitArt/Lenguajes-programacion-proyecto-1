@@ -76,5 +76,13 @@ int utf8Length(const char* text);
  */
 void printCell(const char* text, int width);
 
+int dailyRate(int days);
+
+int dailyRateWithPenalty(int days);
+
+int loanAmount(struct Loan *loan);
+
+int parseYearMonth(const char *date, int *year, int *month);
+
 
 #endif
