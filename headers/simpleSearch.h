@@ -8,4 +8,9 @@
  */
 void simpleSearch(const char *searchValue);
 
+/**
+ * @brief Solicita al usuario un texto y ejecuta una búsqueda simple.
+ */
+void handleSimpleSearch(void);
+
 #endif // SIMPLE_SEARCH_H

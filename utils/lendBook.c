@@ -47,6 +47,11 @@ int getLastLoanID() {
 }
 
 int lendBook(char *bookName, char *loanDate, char *returnDate, char *userID) {
+    return lendBookWithID(bookName, loanDate, returnDate, userID, NULL);
+}
+
+int lendBookWithID(char *bookName, char *loanDate, char *returnDate,
+                   char *userID, int *loanID) {
 
     if (parseDays(returnDate) - parseDays(loanDate) < 1) {
         return -1;
@@ -65,6 +70,10 @@ int lendBook(char *bookName, char *loanDate, char *returnDate, char *userID) {
 
     if (!saveLoan(newLoan)) {
         return -3;
+    }
+
+    if (loanID != NULL) {
+        *loanID = newLoan->loanID;
     }
 
     editBookQuantity(book->name, -1);

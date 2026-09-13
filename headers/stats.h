@@ -38,4 +38,9 @@ void printTopMonthsRevenue(struct Loan *loans, int loanCount, int topN);
  */
 void printGenreLoanStats(struct Loan *loans, int loanCount, struct Book *books, int bookCount);
 
+/**
+ * @brief Imprime todas las estadisticas del sistema.
+ */
+void printStats(void);
+
 #endif // STATS_H
