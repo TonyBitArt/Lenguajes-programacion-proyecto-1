@@ -97,7 +97,7 @@ struct Book *parseBooks(const char *path, int *bookCount) {
         // Uso strdup para proteger la memoria de los textos
         books[i].name = (nameJson && nameJson->valuestring) ? strdup(nameJson->valuestring) : NULL;
         books[i].author = (authorJson && authorJson->valuestring) ? strdup(authorJson->valuestring) : NULL;
-        books[i].year = yearJson ? yearJson->valueint : 0;
+        books[i].year = yearJson && yearJson->valuestring ? strdup(yearJson->valuestring) : NULL;
         books[i].genre = (genreJson && genreJson->valuestring) ? strdup(genreJson->valuestring) : NULL;
         books[i].summary = (summaryJson && summaryJson->valuestring) ? strdup(summaryJson->valuestring) : NULL;
         books[i].quantity = quantityJson ? quantityJson->valueint : 0;
@@ -221,7 +221,7 @@ int saveBook(const char *path, struct Book newBook) {
 
     cJSON_AddStringToObject(bookObject, "name", newBook.name ? newBook.name : "");
     cJSON_AddStringToObject(bookObject, "author", newBook.author ? newBook.author : "");
-    cJSON_AddNumberToObject(bookObject, "year", newBook.year);
+    cJSON_AddStringToObject(bookObject, "year", newBook.year ? newBook.year : "");
     cJSON_AddStringToObject(bookObject, "genre", newBook.genre ? newBook.genre : "");
     cJSON_AddStringToObject(bookObject, "summary", newBook.summary ? newBook.summary : "");
     cJSON_AddNumberToObject(bookObject, "quantity", newBook.quantity);

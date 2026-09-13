@@ -15,7 +15,7 @@ struct User {
 struct Book {
     char *name;
     char *author;
-    int year;
+    char* year;
     char *genre;
     char *summary;
     int quantity;

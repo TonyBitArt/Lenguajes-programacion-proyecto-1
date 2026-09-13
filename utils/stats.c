@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "../headers/jsonHandler.h"
 #include "../headers/stats.h"
+#include "..headers/inputUtils.h"
 
 static int parseYearMonth(const char *date, int *year, int *month) {
     if (!date) return -1;
@@ -12,17 +13,6 @@ static int parseYearMonth(const char *date, int *year, int *month) {
     *year = y;
     *month = m;
     return 0;
-}
-
-static long parseDays(const char *date) {
-    if (!date) return -1;
-    int y, m, d;
-    if (sscanf(date, "%d-%d-%d", &y, &m, &d) != 3) return -1;
-    
-    long a = (14 - m) / 12;
-    long yy = y + 4800 - a;
-    long mm = m + 12 * a - 3;
-    return d + (153 * mm + 2) / 5 + 365 * yy + yy / 4 - yy / 100 + yy / 400 - 32045;
 }
 
 static int dailyRate(int days) {
