@@ -1,0 +1,115 @@
+#include <stdio.h>
+#include "../headers/menu.h"
+#include "../headers/catalog.h"
+#include "../headers/inputUtils.h"
+#include "../headers/userManagement.h"
+#include "../headers/loanFeatures.h"
+#include "../headers/stats.h"
+#include "../headers/simpleSearch.h"
+#include "../headers/advancedSearch.h"
+#include "../headers/lendBook.h"
+#include "../headers/returnBook.h"
+
+int displayMainMenu(void) {
+    printf("\n========================================\n");
+    printf("      SISTEMA DE GESTIÓN DE BIBLIOTECA\n");
+    printf("========================================\n");
+    printf("%d. Menú de funciones operativas\n", MAIN_MENU_OPERATIONAL);
+    printf("%d. Menú de funciones generales\n", MAIN_MENU_GENERAL);
+    printf("%d. Salir\n", MAIN_MENU_EXIT);
+    printf("========================================\n");
+    printf("Seleccione una opción: ");
+    
+    return validateInt(); 
+}
+
+void handleOperationalOptions(void) {
+    int selectedOption;
+    
+    do {
+        printf("\n--- Menú de funciones operativas ---\n");
+        printf("%d. Gestión de catálogo\n", OPERATIONAL_MENU_CATALOG);
+        printf("%d. Gestión de usuarios\n", OPERATIONAL_MENU_USERS);
+        printf("%d. Historial de préstamos\n", OPERATIONAL_MENU_HISTORY);
+        printf("%d. Vencimiento de préstamos\n", OPERATIONAL_MENU_EXPIRATION);
+        printf("%d. Estadísticas\n", OPERATIONAL_MENU_STATISTICS);
+        printf("%d. Volver\n", OPERATIONAL_MENU_BACK);
+        printf("Seleccione una opción: ");
+        
+        selectedOption = validateInt();
+        
+        switch (selectedOption) {
+            case OPERATIONAL_MENU_CATALOG:
+                handleCatalogOptions();
+                break;
+                
+            case OPERATIONAL_MENU_USERS:
+                userOptions();
+                break;
+                
+            case OPERATIONAL_MENU_HISTORY:
+                executeLoanFeature(loanHistory);
+                break;
+                
+            case OPERATIONAL_MENU_EXPIRATION:
+                executeLoanFeature(printExpiringLoans);
+                break;
+                
+            case OPERATIONAL_MENU_STATISTICS:
+                printStats();
+                break;
+                
+            case OPERATIONAL_MENU_BACK:
+                printf("\n Volviendo al menú principal...\n");
+                break;
+                
+            default:
+                printf("\n Opción inválida, por favor seleccione una opción válida\n");
+                break;
+        }
+        
+    } while (selectedOption != OPERATIONAL_MENU_BACK);
+}
+
+void handleGeneralOptions(void) {
+    int selectedOption;
+    
+    do {
+        printf("\n--- Menú de funciones generales ---\n");
+        printf("%d. Búsqueda simple\n", GENERAL_MENU_SIMPLE_SEARCH);
+        printf("%d. Búsqueda avanzada\n", GENERAL_MENU_ADVANCED_SEARCH);
+        printf("%d. Préstamo de ejemplares\n", GENERAL_MENU_LOAN);
+        printf("%d. Devolución de ejemplares\n", GENERAL_MENU_RETURN);
+        printf("%d. Volver\n", GENERAL_MENU_BACK);
+        printf("Seleccione una opción: ");
+        
+        selectedOption = validateInt();
+        
+        switch (selectedOption) {
+            case GENERAL_MENU_SIMPLE_SEARCH:
+                handleSimpleSearch();
+                break;
+                
+            case GENERAL_MENU_ADVANCED_SEARCH:
+                handleAdvancedSearch();
+                break;
+                
+            case GENERAL_MENU_LOAN:
+                handleLendBook();
+                break;
+                
+            case GENERAL_MENU_RETURN:
+                handleReturnBook();
+                break;
+                
+            case GENERAL_MENU_BACK:
+                printf("\n Volviendo al menú principal...\n");
+                break;
+                
+            default:
+                printf("\n Opción inválida, por favor seleccione una opción válida\n");
+                break;
+        }
+        
+    } while (selectedOption != GENERAL_MENU_BACK);
+}

@@ -1,8 +1,29 @@
 [{
-    "name": "Cien anos de soledad",
-    "author": "Gabriel Garcia Marquez",
-    "year": "1967",
-    "genre": "Realismo magico",
-    "summary": "Esta novela cuenta la historia...",
-    "quantity": 4
-}]
+		"name":	"Cien años de soledad",
+		"author":	"Gabriel Garcia Marquez",
+		"year":	"1967",
+		"genre":	"Realismo magico",
+		"summary":	"Esta novela cuenta la historia...",
+		"quantity":	4
+	}, {
+		"name":	"Don Quijote de la Mancha",
+		"author":	"Miguel de Cervantes",
+		"year":	"1605",
+		"genre":	"Novela caballeresca",
+		"summary":	"La historia sigue las aventuras...",
+		"quantity":	3
+	}, {
+		"name":	"La sombra del viento",
+		"author":	"Carlos Ruiz Zafón",
+		"year":	"2001",
+		"genre":	"Misterio, suspenso",
+		"summary":	"La novela narra la historia de...",
+		"quantity":	2
+	}, {
+		"name":	"Ficciones",
+		"author":	"Jorge Luis Borges",
+		"year":	"1944",
+		"genre":	"literatura fantástica",
+		"summary":	"Esta colección de cuentos cortos...",
+		"quantity":	3
+	}]

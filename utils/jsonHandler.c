@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "../cJSON/cJSON.h"
 #include "../headers/jsonHandler.h"
 
@@ -61,10 +62,10 @@ struct User *parseUsers(const char *path, int *userCount) {
         cJSON *IDJson = cJSON_GetObjectItem(userJson, "ID");
         cJSON *addressJson = cJSON_GetObjectItem(userJson, "address");
 
-        users[i].name = nameJson ? nameJson->valuestring : NULL;
-        users[i].lastName = lastNameJson ? lastNameJson->valuestring : NULL;
-        users[i].ID = IDJson ? IDJson->valueint : 0;
-        users[i].address = addressJson ? addressJson->valuestring : NULL;
+        users[i].name = nameJson && nameJson->valuestring ? strdup(nameJson->valuestring) : NULL;
+        users[i].lastName = lastNameJson && lastNameJson->valuestring ? strdup(lastNameJson->valuestring) : NULL;
+        users[i].ID = IDJson && IDJson->valuestring ? strdup(IDJson->valuestring) : NULL;
+        users[i].address = addressJson && addressJson->valuestring ? strdup(addressJson->valuestring) : NULL;
     }
     cJSON_Delete(usersJson);
     return users;
@@ -93,11 +94,12 @@ struct Book *parseBooks(const char *path, int *bookCount) {
         cJSON *summaryJson = cJSON_GetObjectItem(bookJson, "summary");
         cJSON *quantityJson = cJSON_GetObjectItem(bookJson, "quantity");
 
-        books[i].name = nameJson ? nameJson->valuestring : NULL;
-        books[i].author = authorJson ? authorJson->valuestring : NULL;
-        books[i].year = yearJson ? yearJson->valueint : 0;
-        books[i].genre = genreJson ? genreJson->valuestring : NULL;
-        books[i].summary = summaryJson ? summaryJson->valuestring : NULL;
+        // Uso strdup para proteger la memoria de los textos
+        books[i].name = (nameJson && nameJson->valuestring) ? strdup(nameJson->valuestring) : NULL;
+        books[i].author = (authorJson && authorJson->valuestring) ? strdup(authorJson->valuestring) : NULL;
+        books[i].year = yearJson && yearJson->valuestring ? strdup(yearJson->valuestring) : NULL;
+        books[i].genre = (genreJson && genreJson->valuestring) ? strdup(genreJson->valuestring) : NULL;
+        books[i].summary = (summaryJson && summaryJson->valuestring) ? strdup(summaryJson->valuestring) : NULL;
         books[i].quantity = quantityJson ? quantityJson->valueint : 0;
     }
     cJSON_Delete(booksJson);
@@ -122,20 +124,115 @@ struct Loan *parseLoans(const char *path, int *loanCount){
         if (!loanJson) continue;
 
         cJSON *loanIDJson = cJSON_GetObjectItem(loanJson, "loanID");
-        cJSON *userJson = cJSON_GetObjectItem(loanJson, "user");
+        cJSON *userIDJson = cJSON_GetObjectItem(loanJson, "userID");
         cJSON *bookNameJson = cJSON_GetObjectItem(loanJson, "bookName");
-        cJSON *bookIDJson = cJSON_GetObjectItem(loanJson, "bookID");
+        cJSON *bookCopyNumberJson = cJSON_GetObjectItem(loanJson, "bookCopyNumber");
         cJSON *loanDateJson = cJSON_GetObjectItem(loanJson, "loanDate");
         cJSON *returnDateJson = cJSON_GetObjectItem(loanJson, "returnDate");
+        cJSON *actualReturnDateJson = cJSON_GetObjectItem(loanJson, "actualReturnDate");
+        cJSON *statusJson = cJSON_GetObjectItem(loanJson, "status");
 
         loans[i].loanID = loanIDJson ? loanIDJson->valueint : 0;
-        loans[i].user = userJson ? userJson->valuestring : NULL;
-        loans[i].bookName = bookNameJson ? bookNameJson->valuestring : NULL;
-        loans[i].bookID = bookIDJson ? bookIDJson->valueint : 0;
-        loans[i].loanDate = loanDateJson ? loanDateJson->valuestring : NULL;
-        loans[i].returnDate = returnDateJson ? returnDateJson->valuestring : NULL;
+        loans[i].userID = userIDJson && userIDJson->valuestring ? strdup(userIDJson->valuestring) : NULL;
+        loans[i].bookName = bookNameJson && bookNameJson->valuestring ? strdup(bookNameJson->valuestring) : NULL;
+        loans[i].bookCopyNumber = bookCopyNumberJson ? bookCopyNumberJson->valueint : 0;
+        loans[i].loanDate = loanDateJson && loanDateJson->valuestring ? strdup(loanDateJson->valuestring) : NULL;
+        loans[i].returnDate = returnDateJson && returnDateJson->valuestring ? strdup(returnDateJson->valuestring) : NULL;
+        loans[i].actualReturnDate = actualReturnDateJson && actualReturnDateJson->valuestring ? strdup(actualReturnDateJson->valuestring) : NULL;
+        loans[i].status = statusJson && statusJson->valuestring ? strdup(statusJson->valuestring) : NULL;
     }
     cJSON_Delete(loansJson);
     return loans;
 }
 
+/**
+ * @brief guarda un objeto JSON en un archivo
+ * @param path la ruta del archivo donde se guardará el JSON
+ * @param jsonObject el objeto JSON a guardar
+ * @return int 1 si se guardó exitosamente, 0 si ocurrió un error
+ */
+int saveJsonToFile(const char *path, cJSON *jsonObject) {
+    if (!jsonObject) {
+        return 0;
+    }
+
+    char *jsonString = cJSON_Print(jsonObject);
+    if (!jsonString) {
+        return 0;
+    }
+
+    FILE *file = fopen(path, "wb");
+    if (!file) {
+        free(jsonString);
+        return 0;
+    }
+
+    fwrite(jsonString, sizeof(char), strlen(jsonString), file);
+    fclose(file);
+
+    free(jsonString);
+    return 1;
+}
+
+/**
+ * @brief libera la memoria dinámica de un arreglo de Book obtenido con
+ * parseBooks
+ * @param books el arreglo a que se va a liberar
+ * @param bookCount cantidad de elementos que tiene el arreglo
+ */
+void freeBooks(struct Book *books, int bookCount) {
+    if (!books) return;
+    for (int i = 0; i < bookCount; i++) {
+        free(books[i].name);
+        free(books[i].author);
+        free(books[i].genre);
+        free(books[i].summary);
+    }
+    free(books);
+}
+
+/**
+ * @brief agrega un nuevo libro al archivo JSON de catálogo (lee, valida
+ * unicidad por nombre, agrega y reescribe el archivo)
+ * @param path la ruta del archivo JSON de libros
+ * @param newBook el libro a agregar
+ * @return int 1 si se guardó, 0 si el nombre ya existe en el catálogo
+ */
+int saveBook(const char *path, struct Book newBook) {
+    cJSON *booksArray = parseJsonFile(path);
+
+    if (!booksArray) {
+        booksArray = cJSON_CreateArray();
+    }
+
+    // valida la unicidad por nombre
+    int arraySize = cJSON_GetArraySize(booksArray);
+    for (int i = 0; i < arraySize; i++) {
+        cJSON *bookJson = cJSON_GetArrayItem(booksArray, i);
+        cJSON *nameJson = bookJson ? cJSON_GetObjectItem(bookJson, "name") : NULL;
+        if (nameJson && nameJson->valuestring && newBook.name &&
+            strcmp(nameJson->valuestring, newBook.name) == 0) {
+            cJSON_Delete(booksArray);
+            return 0; // ya existe
+        }
+    }
+
+    cJSON *bookObject = cJSON_CreateObject();
+    if (!bookObject) {
+        cJSON_Delete(booksArray);
+        return 0;
+    }
+
+    cJSON_AddStringToObject(bookObject, "name", newBook.name ? newBook.name : "");
+    cJSON_AddStringToObject(bookObject, "author", newBook.author ? newBook.author : "");
+    cJSON_AddStringToObject(bookObject, "year", newBook.year ? newBook.year : "");
+    cJSON_AddStringToObject(bookObject, "genre", newBook.genre ? newBook.genre : "");
+    cJSON_AddStringToObject(bookObject, "summary", newBook.summary ? newBook.summary : "");
+    cJSON_AddNumberToObject(bookObject, "quantity", newBook.quantity);
+
+    cJSON_AddItemToArray(booksArray, bookObject);
+    int success = saveJsonToFile(path, booksArray);
+
+    cJSON_Delete(booksArray);
+    return success;
+}
