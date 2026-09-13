@@ -76,7 +76,6 @@ struct Loan *parseLoans(const char *path, int *loanCount);
  */
 cJSON *parseJsonFile(const char *path);
 
-
 /**
  * @brief guarda un objeto JSON en un archivo
  * @param path la ruta del archivo donde se guardará el JSON
@@ -85,5 +84,21 @@ cJSON *parseJsonFile(const char *path);
  */
 int saveJsonToFile(const char* path, cJSON* jsonObject);
 
+/**
+ * @brief agrega un nuevo libro al archivo JSON de catálogo (lee, valida
+ * unicidad por nombre, agrega y reescribe el archivo)
+ * @param path la ruta del archivo JSON de libros
+ * @param newBook el libro a agregar
+ * @return int 1 si se guardó, 0 si el nombre ya existe en el catálogo
+ */
+int saveBook(const char *path, struct Book newBook);
+
+/**
+ * @brief libera la memoria dinámica de un arreglo de Book obtenido con
+ * parseBooks
+ * @param books el arreglo a que se va a liberar
+ * @param bookCount cantidad de elementos que tiene el arreglo
+ */
+void freeBooks(struct Book *books, int bookCount);
 
 #endif // JSONHANDLER_H

@@ -3,11 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 // Includes de los archivos de cabecera del proyecto
 #include "../cJSON/cJSON.h"
 #include "../headers/jsonHandler.h"
-
 
 /**
  * @brief Lee un archivo y devuelve su contenido como una cadena de caracteres.
@@ -34,7 +32,6 @@ char* readFile(const char *path) {
     return bufer;
 }
 
-
 cJSON *parseJsonFile(const char *path) {
     char *jsonString = readFile(path);
     if (!jsonString) {
@@ -45,9 +42,7 @@ cJSON *parseJsonFile(const char *path) {
     free(jsonString);
     
     return json;
-
 }
-
 
 struct User *parseUsers(const char *path, int *userCount) {
     cJSON *usersJson = parseJsonFile(path);
@@ -83,7 +78,6 @@ struct User *parseUsers(const char *path, int *userCount) {
     return users;
 }
 
-
 struct Book *parseBooks(const char *path, int *bookCount) {
     cJSON *booksJson = parseJsonFile(path);
     if (!booksJson) return NULL;
@@ -107,18 +101,16 @@ struct Book *parseBooks(const char *path, int *bookCount) {
         cJSON *summaryJson = cJSON_GetObjectItem(bookJson, "summary");
         cJSON *quantityJson = cJSON_GetObjectItem(bookJson, "quantity");
 
-        books[i].name = nameJson && nameJson->valuestring ? strdup(nameJson->valuestring) : NULL;
-        books[i].author = authorJson && authorJson->valuestring ? strdup(authorJson->valuestring) : NULL;
+        books[i].name = (nameJson && nameJson->valuestring) ? strdup(nameJson->valuestring) : NULL;
+        books[i].author = (authorJson && authorJson->valuestring) ? strdup(authorJson->valuestring) : NULL;
         books[i].year = yearJson ? yearJson->valueint : 0;
-        books[i].genre = genreJson && genreJson->valuestring ? strdup(genreJson->valuestring) : NULL;
-        books[i].summary = summaryJson && summaryJson->valuestring ? strdup(summaryJson->valuestring) : NULL;
+        books[i].genre = (genreJson && genreJson->valuestring) ? strdup(genreJson->valuestring) : NULL;
+        books[i].summary = (summaryJson && summaryJson->valuestring) ? strdup(summaryJson->valuestring) : NULL;
         books[i].quantity = quantityJson ? quantityJson->valueint : 0;
     }
     cJSON_Delete(booksJson);
     return books;
-
 }
-
 
 struct Loan *parseLoans(const char *path, int *loanCount){
     cJSON *loansJson = parseJsonFile(path);
@@ -158,24 +150,23 @@ struct Loan *parseLoans(const char *path, int *loanCount){
     return loans;
 }
 
-
 /**
  * @brief guarda un objeto JSON en un archivo
  * @param path la ruta del archivo donde se guardará el JSON
  * @param jsonObject el objeto JSON a guardar
  * @return int 1 si se guardó exitosamente, 0 si ocurrió un error
  */
-int saveJsonToFile(const char* path, cJSON* jsonObject) {
+int saveJsonToFile(const char *path, cJSON *jsonObject) {
     if (!jsonObject) {
         return 0;
     }
 
-    char* jsonString = cJSON_Print(jsonObject);
+    char *jsonString = cJSON_Print(jsonObject);
     if (!jsonString) {
         return 0;
     }
 
-    FILE* file = fopen(path, "wb");
+    FILE *file = fopen(path, "wb");
     if (!file) {
         free(jsonString);
         return 0;
@@ -186,4 +177,69 @@ int saveJsonToFile(const char* path, cJSON* jsonObject) {
 
     free(jsonString);
     return 1;
+}
+
+
+/**
+ * @brief libera la memoria dinámica de un arreglo de Book obtenido con
+ * parseBooks
+ * @param books el arreglo a que se va a liberar
+ * @param bookCount cantidad de elementos que tiene el arreglo
+ */
+void freeBooks(struct Book *books, int bookCount) {
+    if (!books) return;
+    for (int i = 0; i < bookCount; i++) {
+        free(books[i].name);
+        free(books[i].author);
+        free(books[i].genre);
+        free(books[i].summary);
+    }
+    free(books);
+}
+
+
+/**
+ * @brief agrega un nuevo libro al archivo JSON de catálogo (lee, valida
+ * unicidad por nombre, agrega y reescribe el archivo)
+ * @param path la ruta del archivo JSON de libros
+ * @param newBook el libro a agregar
+ * @return int 1 si se guardó, 0 si el nombre ya existe en el catálogo
+ */
+int saveBook(const char *path, struct Book newBook) {
+    cJSON *booksArray = parseJsonFile(path);
+
+    if (!booksArray) {
+        booksArray = cJSON_CreateArray();
+    }
+
+    // valida la unicidad por nombre
+    int arraySize = cJSON_GetArraySize(booksArray);
+    for (int i = 0; i < arraySize; i++) {
+        cJSON *bookJson = cJSON_GetArrayItem(booksArray, i);
+        cJSON *nameJson = bookJson ? cJSON_GetObjectItem(bookJson, "name") : NULL;
+        if (nameJson && nameJson->valuestring && newBook.name &&
+            strcmp(nameJson->valuestring, newBook.name) == 0) {
+            cJSON_Delete(booksArray);
+            return 0; // ya existe
+        }
+    }
+
+    cJSON *bookObject = cJSON_CreateObject();
+    if (!bookObject) {
+        cJSON_Delete(booksArray);
+        return 0;
+    }
+
+    cJSON_AddStringToObject(bookObject, "name", newBook.name ? newBook.name : "");
+    cJSON_AddStringToObject(bookObject, "author", newBook.author ? newBook.author : "");
+    cJSON_AddNumberToObject(bookObject, "year", newBook.year);
+    cJSON_AddStringToObject(bookObject, "genre", newBook.genre ? newBook.genre : "");
+    cJSON_AddStringToObject(bookObject, "summary", newBook.summary ? newBook.summary : "");
+    cJSON_AddNumberToObject(bookObject, "quantity", newBook.quantity);
+
+    cJSON_AddItemToArray(booksArray, bookObject);
+    int success = saveJsonToFile(path, booksArray);
+
+    cJSON_Delete(booksArray);
+    return success;
 }
