@@ -34,7 +34,7 @@ static void viewCatalog(void) {
         printf("Libro %d:\n", i + 1);
         printf("  Nombre: %s\n", books[i].name ? books[i].name : "");
         printf("  Autor: %s\n", books[i].author ? books[i].author : "");
-        printf("  Año: %d\n", books[i].year);
+        printf("  Año: %s\n", books[i].year ? books[i].year : "");
         printf("  Género: %s\n", books[i].genre ? books[i].genre : "");
         printf("  Resumen: %s\n", books[i].summary ? books[i].summary : "");
         printf("  Cantidad: %d\n", books[i].quantity);
@@ -86,7 +86,22 @@ static void addSingleBook(void) {
         }
 
         printf("Año de publicación: ");
-        int bookYear = validateInt();
+        char *bookYear = readInput();
+        if (bookYear == NULL) {
+            fprintf(stderr, "Error: No se pudo asignar memoria\n");
+            free(bookName);
+            free(bookAuthor);
+            pauseScreen();
+            return;
+        }
+        if (isEmptyString(bookYear)) {
+            fprintf(stderr, "Error: No se puede ingresar un campo vacío\n");
+            free(bookName);
+            free(bookAuthor);
+            free(bookYear);
+            pauseScreen();
+            continue;
+        }
 
         printf("Género literario: ");
         char *bookGenre = readInput();
@@ -94,6 +109,7 @@ static void addSingleBook(void) {
             fprintf(stderr, "Error: No se pudo asignar memoria\n");
             free(bookName);
             free(bookAuthor);
+            free(bookYear);
             pauseScreen();
             return;
         }
@@ -101,6 +117,7 @@ static void addSingleBook(void) {
             fprintf(stderr, "Error: No se puede ingresar un campo vacío\n");
             free(bookName);
             free(bookAuthor);
+            free(bookYear);
             free(bookGenre);
             pauseScreen();
             continue;
@@ -112,6 +129,7 @@ static void addSingleBook(void) {
             fprintf(stderr, "Error: No se pudo asignar memoria.\n");
             free(bookName);
             free(bookAuthor);
+            free(bookYear);
             free(bookGenre);
             pauseScreen();
             return;
@@ -120,6 +138,7 @@ static void addSingleBook(void) {
             fprintf(stderr, "Error: No se puede ingresar un campo vacío\n");
             free(bookName);
             free(bookAuthor);
+            free(bookYear);
             free(bookGenre);
             free(bookSummary);
             pauseScreen();
@@ -148,6 +167,7 @@ static void addSingleBook(void) {
 
         free(bookName);
         free(bookAuthor);
+        free(bookYear);
         free(bookGenre);
         free(bookSummary);
 
@@ -229,7 +249,7 @@ static void addBooksBatch(void) {
         struct Book newBook;
         newBook.name = name;
         newBook.author = author;
-        newBook.year = atoi(yearStr);
+        newBook.year = yearStr;
         newBook.genre = genre;
         newBook.summary = summary;
         newBook.quantity = quantity;

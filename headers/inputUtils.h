@@ -1,6 +1,8 @@
 #ifndef INPUT_UTILS_H
 #define INPUT_UTILS_H
 
+#include "./jsonHandler.h"
+
 
 /**
  * @brief lee una línea de texto ingresada por el usuario
@@ -42,14 +44,6 @@ void pauseScreen();
  * @return int 1 si el ID es válido, 0 en caso contrario
  */
 int validateID(char* id);
-
-/**
- * @brief convierte una fecha en días
- * @param date la fecha a convertir
- * @return long el número de días
- */
-long parseDays(const char *date);
-
 
 /**
  * @brief Valida la entrada del usuario.

@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "../headers/inputUtils.h"
+#include "../headers/dateUtils.h"
 #include "../headers/lendBook.h"
 #include "../headers/loanUtils.h"
 #include "../headers/bookUtils.h"

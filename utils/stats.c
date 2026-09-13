@@ -6,7 +6,7 @@
 #include "../headers/dateUtils.h"
 #include "../headers/jsonHandler.h"
 #include "../headers/stats.h"
-#include "..headers/inputUtils.h"
+#include "../headers/inputUtils.h"
 
 static struct User getUserByID(struct User *users, int userCount, char* ID) {
     for (int i = 0; i < userCount; i++) {
