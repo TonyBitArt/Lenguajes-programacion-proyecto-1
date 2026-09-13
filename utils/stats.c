@@ -8,33 +8,6 @@
 #include "../headers/stats.h"
 #include "..headers/inputUtils.h"
 
-static int parseYearMonth(const char *date, int *year, int *month) {
-    if (!date) return -1;
-    int y, m, d;
-    if (sscanf(date, "%d-%d-%d", &y, &m, &d) != 3) return -1;
-    *year = y;
-    *month = m;
-    return 0;
-}
-
-static int dailyRate(int days) {
-    if (days >= 1 && days <= 7) return 175;
-    if (days >= 8 && days <= 15) return 150;
-    return 100; /* 16 dias o mas */
-}
-
-static int loanAmount(struct Loan *loan) {
-    long start = parseDays(loan->loanDate);
-
-    const char *endDateToUse = (loan->actualReturnDate != NULL) ? loan->actualReturnDate : loan->returnDate;
-
-    long end = parseDays(endDateToUse);
-    if (start < 0 || end < 0) return 0;
-    int days = (int)(end - start);
-    if (days < 1) days = 1; // prestamos del mismo dia cuentan como 1 dia
-    return days * dailyRate(days);
-}
-
 static struct User getUserByID(struct User *users, int userCount, char* ID) {
     for (int i = 0; i < userCount; i++) {
         if (strcmp(users[i].ID, ID) == 0) {
