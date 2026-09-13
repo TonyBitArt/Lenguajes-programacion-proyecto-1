@@ -1,10 +1,18 @@
+// Includes de la librería estándar
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+// Includes de los archivos de cabecera del proyecto
 #include "../cJSON/cJSON.h"
 #include "../headers/jsonHandler.h"
 
-char *readFile(const char *path) {
+/**
+ * @brief Lee un archivo y devuelve su contenido como una cadena de caracteres.
+ * @param path La ruta del archivo a leer.
+ * @return char* Una cadena de caracteres que contiene el contenido del archivo. NULL si ocurre un error.
+ */
+char* readFile(const char *path) {
     FILE *file = fopen(path, "rb"); // Abrir el archivo en modo lectura/binario
     if (!file) return NULL;
 
@@ -34,7 +42,6 @@ cJSON *parseJsonFile(const char *path) {
     free(jsonString);
     
     return json;
-
 }
 
 struct User *parseUsers(const char *path, int *userCount) {
@@ -94,7 +101,6 @@ struct Book *parseBooks(const char *path, int *bookCount) {
         cJSON *summaryJson = cJSON_GetObjectItem(bookJson, "summary");
         cJSON *quantityJson = cJSON_GetObjectItem(bookJson, "quantity");
 
-        // Uso strdup para proteger la memoria de los textos
         books[i].name = (nameJson && nameJson->valuestring) ? strdup(nameJson->valuestring) : NULL;
         books[i].author = (authorJson && authorJson->valuestring) ? strdup(authorJson->valuestring) : NULL;
         books[i].year = yearJson ? yearJson->valueint : 0;
@@ -104,7 +110,6 @@ struct Book *parseBooks(const char *path, int *bookCount) {
     }
     cJSON_Delete(booksJson);
     return books;
-
 }
 
 struct Loan *parseLoans(const char *path, int *loanCount){
@@ -129,6 +134,8 @@ struct Loan *parseLoans(const char *path, int *loanCount){
         cJSON *bookCopyNumberJson = cJSON_GetObjectItem(loanJson, "bookCopyNumber");
         cJSON *loanDateJson = cJSON_GetObjectItem(loanJson, "loanDate");
         cJSON *returnDateJson = cJSON_GetObjectItem(loanJson, "returnDate");
+        cJSON *actualReturnDateJson = cJSON_GetObjectItem(loanJson, "actualReturnDate");
+        cJSON *statusJson = cJSON_GetObjectItem(loanJson, "status");
 
         loans[i].loanID = loanIDJson ? loanIDJson->valueint : 0;
         loans[i].userID = userIDJson && userIDJson->valuestring ? strdup(userIDJson->valuestring) : NULL;
@@ -136,6 +143,8 @@ struct Loan *parseLoans(const char *path, int *loanCount){
         loans[i].bookCopyNumber = bookCopyNumberJson ? bookCopyNumberJson->valueint : 0;
         loans[i].loanDate = loanDateJson && loanDateJson->valuestring ? strdup(loanDateJson->valuestring) : NULL;
         loans[i].returnDate = returnDateJson && returnDateJson->valuestring ? strdup(returnDateJson->valuestring) : NULL;
+        loans[i].actualReturnDate = actualReturnDateJson && actualReturnDateJson->valuestring ? strdup(actualReturnDateJson->valuestring) : NULL;
+        loans[i].status = statusJson && statusJson->valuestring ? strdup(statusJson->valuestring) : strdup("activo");
     }
     cJSON_Delete(loansJson);
     return loans;
@@ -170,6 +179,7 @@ int saveJsonToFile(const char *path, cJSON *jsonObject) {
     return 1;
 }
 
+
 /**
  * @brief libera la memoria dinámica de un arreglo de Book obtenido con
  * parseBooks
@@ -186,6 +196,7 @@ void freeBooks(struct Book *books, int bookCount) {
     }
     free(books);
 }
+
 
 /**
  * @brief agrega un nuevo libro al archivo JSON de catálogo (lee, valida
