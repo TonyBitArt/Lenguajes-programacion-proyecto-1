@@ -43,6 +43,13 @@ void pauseScreen();
  */
 int validateID(char* id);
 
+/**
+ * @brief convierte una fecha en días
+ * @param date la fecha a convertir
+ * @return long el número de días
+ */
+long parseDays(const char *date);
+
 
 /**
  * @brief Valida la entrada del usuario.

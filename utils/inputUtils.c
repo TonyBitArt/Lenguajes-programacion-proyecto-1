@@ -181,6 +181,16 @@ int validateID(char* id) {
     return 1;
 }
 
+long parseDays(const char *date) {
+    if (!date) return -1;
+    int y, m, d;
+    if (sscanf(date, "%d-%d-%d", &y, &m, &d) != 3) return -1;
+    
+    long a = (14 - m) / 12;
+    long yy = y + 4800 - a;
+    long mm = m + 12 * a - 3;
+    return d + (153 * mm + 2) / 5 + 365 * yy + yy / 4 - yy / 100 + yy / 400 - 32045;
+}
 
 /**
  * @brief Calcula la longitud de una cadena ignorando los bytes de continuación UTF-8.

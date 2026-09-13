@@ -6,6 +6,7 @@
 #include "../headers/dateUtils.h"
 #include "../headers/jsonHandler.h"
 #include "../headers/stats.h"
+#include "..headers/inputUtils.h"
 
 static int parseYearMonth(const char *date, int *year, int *month) {
     if (!date) return -1;
