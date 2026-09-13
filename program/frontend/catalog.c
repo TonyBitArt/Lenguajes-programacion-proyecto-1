@@ -4,8 +4,9 @@
 #include "../headers/catalog.h"
 #include "../headers/inputUtils.h"
 #include "../headers/jsonHandler.h"
+#include "../headers/bookUtils.h"
 
-#define BOOKS_FILE "./data/books.json"
+#define BOOKS_FILE "./program/data/books.json"
 
 int displayCatalogMenu(void) {
     printf("\n--- Submenú de Gestión de Catálogo ---\n");
@@ -34,7 +35,7 @@ static void viewCatalog(void) {
         printf("Libro %d:\n", i + 1);
         printf("  Nombre: %s\n", books[i].name ? books[i].name : "");
         printf("  Autor: %s\n", books[i].author ? books[i].author : "");
-        printf("  Año: %d\n", books[i].year);
+        printf("  Año: %s\n", books[i].year ? books[i].year : "");
         printf("  Género: %s\n", books[i].genre ? books[i].genre : "");
         printf("  Resumen: %s\n", books[i].summary ? books[i].summary : "");
         printf("  Cantidad: %d\n", books[i].quantity);
@@ -86,7 +87,16 @@ static void addSingleBook(void) {
         }
 
         printf("Año de publicación: ");
-        int bookYear = validateInt();
+        int bookYearInt = validateInt();
+        char *bookYear = malloc(16 * sizeof(char));
+        if (bookYear == NULL) {
+            fprintf(stderr, "Error: No se pudo asignar memoria\n");
+            free(bookName);
+            free(bookAuthor);
+            pauseScreen();
+            return;
+        }
+        snprintf(bookYear, 16, "%d", bookYearInt);
 
         printf("Género literario: ");
         char *bookGenre = readInput();
@@ -229,7 +239,7 @@ static void addBooksBatch(void) {
         struct Book newBook;
         newBook.name = name;
         newBook.author = author;
-        newBook.year = atoi(yearStr);
+        newBook.year = yearStr;
         newBook.genre = genre;
         newBook.summary = summary;
         newBook.quantity = quantity;
@@ -296,7 +306,7 @@ static void editBookMenu(void) {
     printf("\n--- Datos actuales ---\n");
     printf("Nombre: %s\n", found->name ? found->name : "");
     printf("Autor: %s\n", found->author ? found->author : "");
-    printf("Año: %d\n", found->year);
+    printf("Año: %s\n", found->year ? found->year : "");
     printf("Género: %s\n", found->genre ? found->genre : "");
     printf("Resumen: %s\n", found->summary ? found->summary : "");
     printf("Cantidad: %d\n", found->quantity);
@@ -307,8 +317,8 @@ static void editBookMenu(void) {
     char *newName = readInput();
     printf("Nuevo autor [%s]: ", found->author ? found->author : "");
     char *newAuthor = readInput();
-    printf("Nuevo año [%d]: ", found->year);
-    int newYear = validateInt();
+    printf("Nuevo año [%s]: ", found->year ? found->year : "");
+    char *newYear = readInput();
     printf("Nuevo género [%s]: ", found->genre ? found->genre : "");
     char *newGenre = readInput();
     printf("Nuevo resumen [%s]: ", found->summary ? found->summary : "");
@@ -330,7 +340,7 @@ static void editBookMenu(void) {
     struct Book updatedBook;
     updatedBook.name = !isEmptyString(newName) ? newName : found->name;
     updatedBook.author = !isEmptyString(newAuthor) ? newAuthor : found->author;
-    updatedBook.year = (newYear != -1) ? newYear : found->year;
+    updatedBook.year = !isEmptyString(newYear) ? newYear : found->year;
     updatedBook.genre = !isEmptyString(newGenre) ? newGenre : found->genre;
     updatedBook.summary = !isEmptyString(newSummary) ? newSummary : found->summary;
     updatedBook.quantity = (newQuantity != -1) ? newQuantity : found->quantity;
@@ -344,6 +354,7 @@ static void editBookMenu(void) {
     free(searchName);
     free(newName);
     free(newAuthor);
+    free(newYear);
     free(newGenre);
     free(newSummary);
     freeBooks(books, bookCount);
@@ -390,7 +401,7 @@ void handleCatalogOptions(void) {
             }
 
             case CATALOG_MENU_EDIT:
-                printf("\n Editar ejemplar...\n");
+                editBookMenu();
                 break;
 
             case CATALOG_MENU_BACK:
