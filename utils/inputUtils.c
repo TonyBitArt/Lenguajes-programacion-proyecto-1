@@ -79,6 +79,44 @@ int validateInt(void) {
 
 
 /**
+ * @brief Valida la entrada del usuario.
+ * @param message El mensaje a mostrar al usuario.
+ * @param funcion Un puntero a la función que se ejecutará si la entrada es inválida.
+ * @param cancelFlag Un puntero a un entero que indica si el usuario desea cancelar.
+ * @return char* La entrada del usuario.
+ */
+char* validateUserInput(const char* message, void (*funcion)(), int* cancelFlag) {
+    while(1) {
+        printf("%s", message);
+        char* input = readInput();
+
+        if (input == NULL) {
+            printf("Error: No se pudo asignar memoria.\n");
+            *cancelFlag = 1;
+            return NULL;
+        }
+
+        if (strcmp(input, "0") == 0) {
+            free(input);
+            *cancelFlag = 1;
+            return NULL;
+        }
+
+        if (isEmptyString(input)) {
+            printf("Error: No se puede ingresar un campo vacío.\n");
+            pauseScreen();
+            clearScreen();
+            funcion();
+            free(input);
+            continue;
+        }
+
+        return input;
+    }
+}
+
+
+/**
  * @brief Verifica si una cadena de caracteres está vacía o contiene solo espacios en blanco.
  * @param string La cadena a verificar.
  * @return int 1 si la cadena está vacía o contiene solo espacios en blanco, 0 en caso contrario.
@@ -141,4 +179,43 @@ int validateID(char* id) {
     }
 
     return 1;
+}
+
+
+/**
+ * @brief Calcula la longitud de una cadena ignorando los bytes de continuación UTF-8.
+ * @param text La cadena a medir.
+ * @return int La cantidad real de caracteres visibles.
+ */
+int utf8Length(const char* text) {
+    int length = 0;
+
+    if (text == NULL) {
+        return 0;
+    }
+
+    for (int i = 0; text[i] != '\0'; i++) {
+        if ((text[i] & 0xC0) != 0x80) {
+            length++;
+        }
+    }
+
+    return length;
+}
+
+
+/**
+ * @brief Imprime una celda de tabla formateada y alineada.
+ * @param text El texto a imprimir.
+ * @param width El ancho total que debe ocupar la celda.
+ */
+void printCell(const char* text, int width){
+    int length = utf8Length(text);
+    printf(" %s", text ? text : "N/A");
+
+    for (int i = length; i < width; i++) {
+        printf(" ");
+    }
+
+    printf(" |");
 }

@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+
+#include "../headers/dateUtils.h"
 #include "../headers/jsonHandler.h"
 #include "../headers/stats.h"
 
@@ -14,17 +16,6 @@ static int parseYearMonth(const char *date, int *year, int *month) {
     return 0;
 }
 
-static long parseDays(const char *date) {
-    if (!date) return -1;
-    int y, m, d;
-    if (sscanf(date, "%d-%d-%d", &y, &m, &d) != 3) return -1;
-    
-    long a = (14 - m) / 12;
-    long yy = y + 4800 - a;
-    long mm = m + 12 * a - 3;
-    return d + (153 * mm + 2) / 5 + 365 * yy + yy / 4 - yy / 100 + yy / 400 - 32045;
-}
-
 static int dailyRate(int days) {
     if (days >= 1 && days <= 7) return 175;
     if (days >= 8 && days <= 15) return 150;
@@ -33,7 +24,10 @@ static int dailyRate(int days) {
 
 static int loanAmount(struct Loan *loan) {
     long start = parseDays(loan->loanDate);
-    long end = parseDays(loan->returnDate);
+
+    const char *endDateToUse = (loan->actualReturnDate != NULL) ? loan->actualReturnDate : loan->returnDate;
+
+    long end = parseDays(endDateToUse);
     if (start < 0 || end < 0) return 0;
     int days = (int)(end - start);
     if (days < 1) days = 1; // prestamos del mismo dia cuentan como 1 dia

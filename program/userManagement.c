@@ -1,9 +1,3 @@
-/**
- * @file userManagement.c
- * @brief Archivo que contiene la implementación de la gestión de usuarios.
- */
-
-
 // Includes de la librería estándar
 #include <stdio.h>
 #include <string.h>
@@ -179,6 +173,7 @@ void addUser() {
             printf("Error: No se pudo guardar el usuario en el archivo JSON.\n");
         } else {
             printf("Usuario guardado exitosamente en el archivo JSON.\n");
+            printUser(newUser);
         }
 
         freeUserData(&newUser);

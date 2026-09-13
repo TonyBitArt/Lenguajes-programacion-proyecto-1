@@ -7,6 +7,7 @@
 // Includes de los archivos de cabecera del proyecto
 #include "../headers/inputUtils.h"
 #include "../headers/userUtils.h"
+#include "../headers/config.h"
 
 
 /**
@@ -74,6 +75,26 @@ void printSearchUserOptions() {
     printf("Seleccione una opción: ");
 }
 
+static void printUserTableHeader() {
+    printf("+--------------+----------------------+----------------------+------------------------------------------+\n");
+    printf("|");
+    printCell("ID", USER_ID_WIDTH);
+    printCell("Nombre", USER_NAME_WIDTH);
+    printCell("Apellido", USER_LASTNAME_WIDTH);
+    printCell("Dirección", USER_ADDRESS_WIDTH);
+    printf("\n");
+    printf("+--------------+----------------------+----------------------+------------------------------------------+\n");
+}
+
+
+static void printUserTableRow(struct User user) {
+    printf("|");
+    printCell(user.ID, USER_ID_WIDTH);
+    printCell(user.name, USER_NAME_WIDTH);
+    printCell(user.lastName, USER_LASTNAME_WIDTH);
+    printCell(user.address, USER_ADDRESS_WIDTH);
+    printf("\n");
+}
 
 /**
  * @brief Muestra la información de un usuario.
@@ -81,16 +102,11 @@ void printSearchUserOptions() {
  * @return void
  */
 void printUser(struct User user) {
-    printf("\n========================================\n");
-    printf("          INFORMACIÓN DEL USUARIO\n");
-    printf("========================================\n");
-    printf("ID:        %s\n", user.ID);
-    printf("Nombre:    %s\n", user.name);
-    printf("Apellido:  %s\n", user.lastName);
-    printf("Dirección: %s\n", user.address);
-    printf("========================================\n");
+    printf("\n");
+    printUserTableHeader();
+    printUserTableRow(user);
+    printf("+--------------+----------------------+----------------------+------------------------------------------+\n");
 }
-
 
 /**
  * @brief Muestra la información de todos los usuarios.
@@ -99,14 +115,14 @@ void printUser(struct User user) {
  * @return void
  */
 void printAllUsers(struct User *users, int userCount) {
-    printf("\n========================================\n");
-    printf("          LISTA DE USUARIOS\n");
-    printf("========================================\n");
+    printf("\n");
+    printUserTableHeader();
+    
     for (int i = 0; i < userCount; i++) {
-        printUser(users[i]);
+        printUserTableRow(users[i]);
+        printf("+--------------+----------------------+----------------------+------------------------------------------+\n");
     }
 }
-
 
 /**
  * @brief Muestra el mensaje de modificación de usuario.
@@ -211,44 +227,6 @@ void freeAllUsers(struct User* users, int userCount) {
 
 
 /**
- * @brief Valida la entrada del usuario.
- * @param message El mensaje a mostrar al usuario.
- * @param funcion Un puntero a la función que se ejecutará si la entrada es inválida.
- * @param cancelFlag Un puntero a un entero que indica si el usuario desea cancelar.
- * @return char* La entrada del usuario.
- */
-char* validateUserInput(const char* message, void (*funcion)(), int* cancelFlag) {
-    while(1) {
-        printf("%s", message);
-        char* input = readInput();
-
-        if (input == NULL) {
-            printf("Error: No se pudo asignar memoria.\n");
-            *cancelFlag = 1;
-            return NULL;
-        }
-
-        if (strcmp(input, "0") == 0) {
-            free(input);
-            *cancelFlag = 1;
-            return NULL;
-        }
-
-        if (isEmptyString(input)) {
-            printf("Error: No se puede ingresar un campo vacío.\n");
-            pauseScreen();
-            clearScreen();
-            funcion();
-            free(input);
-            continue;
-        }
-
-        return input;
-    }
-}
-
-
-/**
  * @brief obtiene un usuario por su ID
  * @param path la ruta del archivo donde se encuentra el usuario
  * @param userID el ID del usuario a obtener
@@ -267,15 +245,15 @@ struct User* getUserByID(const char* path, char* userID) {
             foundUser = malloc(sizeof(struct User));
             
             if (foundUser) {
-                *foundUser = users[i];
-                continue;
+                foundUser->ID = strdup(users[i].ID);
+                foundUser->name = strdup(users[i].name);
+                foundUser->lastName = strdup(users[i].lastName);
+                foundUser->address = strdup(users[i].address);
             }
         }
-        
-        freeUserData(&users[i]);
     }
     
-    free(users);
+    freeAllUsers(users, userCount);
     return foundUser; 
 }
 
@@ -480,5 +458,48 @@ int deleteUserByID(const char* path, char* userID) {
     int success = saveJsonToFile(path, usersArray);
     cJSON_Delete(usersArray);
 
+    deleteLoansByUserID(LOANS_FILE_PATH, userID);
+
     return success; 
+}
+
+
+/**
+ * @brief Elimina todos los préstamos asociados a un usuario por su ID.
+ * @param path La ruta del archivo JSON de préstamos.
+ * @param userID El ID del usuario cuyos préstamos se eliminarán.
+ * @return int 1 si fue exitoso, 0 si hubo un error.
+ */
+int deleteLoansByUserID(const char* path, char* userID) {
+    cJSON* loansArray = parseJsonFile(path);
+
+    if (!loansArray) {
+        printf("Error: No se pudo leer el archivo JSON de préstamos.\n");
+        return 0;
+    }
+
+    int loanCount = cJSON_GetArraySize(loansArray);
+    int deleted = 0;
+
+    for (int i = loanCount - 1; i >= 0; i--) {
+        cJSON* loanObject = cJSON_GetArrayItem(loansArray, i);
+        cJSON* userIDItem = cJSON_GetObjectItem(loanObject, "userID");
+
+        if (cJSON_IsString(userIDItem) &&
+            userIDItem->valuestring != NULL &&
+            strcmp(userIDItem->valuestring, userID) == 0) {
+
+            cJSON_DeleteItemFromArray(loansArray, i);
+            deleted++;
+        }
+    }
+
+    if (!saveJsonToFile(path, loansArray)) {
+        cJSON_Delete(loansArray);
+        return 0;
+    }
+
+    cJSON_Delete(loansArray);
+
+    return deleted;
 }

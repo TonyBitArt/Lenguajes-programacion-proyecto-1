@@ -29,6 +29,8 @@ struct Loan {
     int bookCopyNumber;
     char *loanDate;
     char *returnDate;
+    char *actualReturnDate; 
+    char *status;
 };
 
 
@@ -81,7 +83,7 @@ cJSON *parseJsonFile(const char *path);
  * @param jsonObject el objeto JSON a guardar
  * @return int 1 si se guardó exitosamente, 0 si ocurrió un error
  */
-int saveJsonToFile(const char *path, cJSON *jsonObject);
+int saveJsonToFile(const char* path, cJSON* jsonObject);
 
 
 #endif // JSONHANDLER_H
