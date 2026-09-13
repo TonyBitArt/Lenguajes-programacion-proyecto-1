@@ -3,6 +3,7 @@
 #include "../headers/catalog.h"
 #include "../headers/inputUtils.h"
 #include "../headers/userManagement.h"
+#include "../headers/loanFeatures.h"
 
 int displayMainMenu(void) {
     printf("\n========================================\n");
@@ -42,11 +43,11 @@ void handleOperationalOptions(void) {
                 break;
                 
             case OPERATIONAL_MENU_HISTORY:
-                printf("\n Historial de préstamos...\n");
+                executeLoanFeature(loanHistory);
                 break;
                 
             case OPERATIONAL_MENU_EXPIRATION:
-                printf("\n Vencimiento de préstamos...\n");
+                executeLoanFeature(printExpiringLoans);
                 break;
                 
             case OPERATIONAL_MENU_STATISTICS:

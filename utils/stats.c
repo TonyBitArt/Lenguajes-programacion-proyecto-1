@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+
+#include "../headers/dateUtils.h"
 #include "../headers/jsonHandler.h"
 #include "../headers/stats.h"
 #include "..headers/inputUtils.h"
@@ -23,7 +25,10 @@ static int dailyRate(int days) {
 
 static int loanAmount(struct Loan *loan) {
     long start = parseDays(loan->loanDate);
-    long end = parseDays(loan->returnDate);
+
+    const char *endDateToUse = (loan->actualReturnDate != NULL) ? loan->actualReturnDate : loan->returnDate;
+
+    long end = parseDays(endDateToUse);
     if (start < 0 || end < 0) return 0;
     int days = (int)(end - start);
     if (days < 1) days = 1; // prestamos del mismo dia cuentan como 1 dia

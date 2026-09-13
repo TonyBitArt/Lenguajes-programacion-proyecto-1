@@ -7,6 +7,15 @@
 
 
 /**
+ * @brief Anchos de las columnas para la visualización de usuarios.
+ */
+#define USER_ID_WIDTH 12
+#define USER_NAME_WIDTH 20
+#define USER_LASTNAME_WIDTH 20
+#define USER_ADDRESS_WIDTH 40
+
+
+/**
  * @brief Muestra las opciones de gestión de usuarios.
  * @return void
  */
@@ -98,7 +107,7 @@ struct User createUser(char* ID, const char* name, const char* lastName, const c
  * @param user Un puntero al usuario a liberar.
  * @return void
  */
-void freeUserData(struct User *user);
+void freeUserData(struct User* user);
 
 
 /**
@@ -107,17 +116,7 @@ void freeUserData(struct User *user);
  * @param userCount El número de usuarios en el array.
  * @return void
  */
-void freeAllUsers(struct User *users, int userCount);
-
-
-/**
- * @brief Valida la entrada del usuario.
- * @param message El mensaje a mostrar al usuario.
- * @param funcion Un puntero a la función que se ejecutará si la entrada es inválida.
- * @param cancelFlag Un puntero a un entero que indica si el usuario desea cancelar.
- * @return char* La entrada del usuario.
- */
-char* validateUserInput(const char* message, void (*funcion)(), int* cancelFlag);
+void freeAllUsers(struct User* users, int userCount);
 
 
 /**
@@ -173,5 +172,13 @@ void modifyUserData(const char* path, struct User* user);
  */
 int deleteUserByID(const char* path, char* userID);
 
+
+/**
+ * @brief Elimina todos los préstamos asociados a un usuario por su ID.
+ * @param path La ruta del archivo JSON de préstamos.
+ * @param userID El ID del usuario cuyos préstamos se eliminarán.
+ * @return int 1 si fue exitoso, 0 si hubo un error.
+ */
+int deleteLoansByUserID(const char* path, char* userID);
 
 #endif // USER_UTILS_H
