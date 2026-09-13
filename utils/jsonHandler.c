@@ -225,3 +225,48 @@ int saveBook(const char *path, struct Book newBook) {
     cJSON_Delete(booksArray);
     return success;
 }
+
+int editBook(const char *path, const char *currentName, struct Book updatedBook) {
+    cJSON *booksArray = parseJsonFile(path);
+    if (!booksArray || !currentName) {
+        if (booksArray) cJSON_Delete(booksArray);
+        return 0;
+    }
+
+    int arraySize = cJSON_GetArraySize(booksArray);
+    cJSON *targetBook = NULL;
+
+    for (int i = 0; i < arraySize; i++) {
+        cJSON *bookJson = cJSON_GetArrayItem(booksArray, i);
+        cJSON *nameJson = bookJson ? cJSON_GetObjectItem(bookJson, "name") : NULL;
+        if (!nameJson || !nameJson->valuestring) continue;
+
+        if (strcmp(nameJson->valuestring, currentName) == 0) {
+            targetBook = bookJson;
+            continue;
+        }
+
+        // si el nuevo nombre coincide con otro libro, es un conflicto de unicidad
+        if (updatedBook.name && strcmp(nameJson->valuestring, updatedBook.name) == 0) {
+            cJSON_Delete(booksArray);
+            return 0;
+        }
+    }
+
+    if (!targetBook) {
+        cJSON_Delete(booksArray);
+        return 0; // no se encontró el libro a editar
+    }
+
+    cJSON_ReplaceItemInObject(targetBook, "name", cJSON_CreateString(updatedBook.name ? updatedBook.name : ""));
+    cJSON_ReplaceItemInObject(targetBook, "author", cJSON_CreateString(updatedBook.author ? updatedBook.author : ""));
+    cJSON_ReplaceItemInObject(targetBook, "year", cJSON_CreateNumber(updatedBook.year));
+    cJSON_ReplaceItemInObject(targetBook, "genre", cJSON_CreateString(updatedBook.genre ? updatedBook.genre : ""));
+    cJSON_ReplaceItemInObject(targetBook, "summary", cJSON_CreateString(updatedBook.summary ? updatedBook.summary : ""));
+    cJSON_ReplaceItemInObject(targetBook, "quantity", cJSON_CreateNumber(updatedBook.quantity));
+
+    int success = saveJsonToFile(path, booksArray);
+
+    cJSON_Delete(booksArray);
+    return success;
+}

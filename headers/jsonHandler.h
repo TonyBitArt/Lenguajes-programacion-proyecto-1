@@ -89,4 +89,15 @@ int saveBook(const char *path, struct Book newBook);
  */
 void freeBooks(struct Book *books, int bookCount);
 
+/**
+ * @brief edita un libro existente del catálogo, identificado por su nombre
+ * actual y valida que el nuevo nombre no choque con el de otro libro diferente
+ * @param path la ruta del archivo JSON de libros
+ * @param currentName el nombre del libro que se va a editar
+ * @param updatedBook los nuevos datos que se le van a poner al libro encontrado
+ * @return int 1 si se editó, 0 si no se encontró el libro o si
+ * el nuevo nombre ya existe en otro libro del catálogo
+ */
+int editBook(const char *path, const char *currentName, struct Book updatedBook);
+
 #endif // JSONHANDLER_H

@@ -253,6 +253,104 @@ static void addBooksBatch(void) {
     printf("Resumen: %d procesados exitosamente, %d no procesados\n", processedCount, errorCount);
 }
 
+/**
+ * @brief permite editar un libro existente del catálogo, solicita el nombre
+ * exacto del libro a editar, muestra sus datos actuales, y permite dejar
+ * en blanco (Enter) cualquier campo para mantener su valor actual
+ * @return void
+ */
+static void editBookMenu(void) {
+    clearScreen();
+    printf("\n--- Editar libro ---\n");
+    printf("Ingrese el nombre exacto del libro a editar: ");
+    char *searchName = readInput();
+    if (searchName == NULL) {
+        fprintf(stderr, "Error: No se pudo asignar memoria\n");
+        pauseScreen();
+        return;
+    }
+    if (isEmptyString(searchName)) {
+        fprintf(stderr, "Error: Debe ingresar un nombre\n");
+        free(searchName);
+        pauseScreen();
+        return;
+    }
+    int bookCount = 0;
+    struct Book *books = parseBooks(BOOKS_FILE, &bookCount);
+    struct Book *found = NULL;
+    for (int i = 0; i < bookCount; i++) {
+        if (books[i].name && strcmp(books[i].name, searchName) == 0) {
+            found = &books[i];
+            break;
+        }
+    }
+
+    if (!found) {
+        printf("\nNo se encontró ningún libro con ese nombre\n");
+        free(searchName);
+        freeBooks(books, bookCount);
+        pauseScreen();
+        return;
+    }
+
+    printf("\n--- Datos actuales ---\n");
+    printf("Nombre: %s\n", found->name ? found->name : "");
+    printf("Autor: %s\n", found->author ? found->author : "");
+    printf("Año: %d\n", found->year);
+    printf("Género: %s\n", found->genre ? found->genre : "");
+    printf("Resumen: %s\n", found->summary ? found->summary : "");
+    printf("Cantidad: %d\n", found->quantity);
+
+    printf("\nIngrese los nuevos datos (deje vacío para mantener el valor actual):\n\n");
+
+    printf("Nuevo nombre [%s]: ", found->name ? found->name : "");
+    char *newName = readInput();
+    printf("Nuevo autor [%s]: ", found->author ? found->author : "");
+    char *newAuthor = readInput();
+    printf("Nuevo año [%d]: ", found->year);
+    int newYear = validateInt();
+    printf("Nuevo género [%s]: ", found->genre ? found->genre : "");
+    char *newGenre = readInput();
+    printf("Nuevo resumen [%s]: ", found->summary ? found->summary : "");
+    char *newSummary = readInput();
+    printf("Nueva cantidad [%d]: ", found->quantity);
+    int newQuantity = validateInt();
+
+    if (newName == NULL || newAuthor == NULL || newGenre == NULL || newSummary == NULL) {
+        fprintf(stderr, "Error: No se pudo asignar memoria\n");
+        free(searchName);
+        if (newName) free(newName);
+        if (newAuthor) free(newAuthor);
+        if (newGenre) free(newGenre);
+        if (newSummary) free(newSummary);
+        freeBooks(books, bookCount);
+        pauseScreen();
+        return;
+    }
+    struct Book updatedBook;
+    updatedBook.name = !isEmptyString(newName) ? newName : found->name;
+    updatedBook.author = !isEmptyString(newAuthor) ? newAuthor : found->author;
+    updatedBook.year = (newYear != -1) ? newYear : found->year;
+    updatedBook.genre = !isEmptyString(newGenre) ? newGenre : found->genre;
+    updatedBook.summary = !isEmptyString(newSummary) ? newSummary : found->summary;
+    updatedBook.quantity = (newQuantity != -1) ? newQuantity : found->quantity;
+
+    if (!editBook(BOOKS_FILE, searchName, updatedBook)) {
+        fprintf(stderr, "Error: no se pudo editar (el nuevo nombre ya existe en otro libro o el libro ya no existe)\n");
+    } else {
+        printf("\nLibro editado correctamente\n");
+    }
+
+    free(searchName);
+    free(newName);
+    free(newAuthor);
+    free(newGenre);
+    free(newSummary);
+    freeBooks(books, bookCount);
+
+    pauseScreen();
+}
+
 // controlador para la gestión del catálogo
 void handleCatalogOptions(void) {
     int selectedOption;
