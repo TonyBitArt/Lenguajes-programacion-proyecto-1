@@ -9,4 +9,9 @@
  */
 int returnBook(int loanID, const char *actualReturnDate);
 
+/**
+ * @brief Solicita los datos al usuario y registra una devolución.
+ */
+void handleReturnBook(void);
+
 #endif // RETURNBOOK_H

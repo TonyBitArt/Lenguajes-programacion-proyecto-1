@@ -4,6 +4,11 @@
 #include "../headers/inputUtils.h"
 #include "../headers/userManagement.h"
 #include "../headers/loanFeatures.h"
+#include "../headers/stats.h"
+#include "../headers/simpleSearch.h"
+#include "../headers/advancedSearch.h"
+#include "../headers/lendBook.h"
+#include "../headers/returnBook.h"
 
 int displayMainMenu(void) {
     printf("\n========================================\n");
@@ -51,7 +56,7 @@ void handleOperationalOptions(void) {
                 break;
                 
             case OPERATIONAL_MENU_STATISTICS:
-                printf("\n Estadísticas...\n");
+                printStats();
                 break;
                 
             case OPERATIONAL_MENU_BACK:
@@ -82,19 +87,19 @@ void handleGeneralOptions(void) {
         
         switch (selectedOption) {
             case GENERAL_MENU_SIMPLE_SEARCH:
-                printf("\n Búsqueda simple...\n");
+                handleSimpleSearch();
                 break;
                 
             case GENERAL_MENU_ADVANCED_SEARCH:
-                printf("\n Búsqueda avanzada...\n");
+                handleAdvancedSearch();
                 break;
                 
             case GENERAL_MENU_LOAN:
-                printf("\n Préstamo de ejemplares...\n");
+                handleLendBook();
                 break;
                 
             case GENERAL_MENU_RETURN:
-                printf("\n Devolución de ejemplares...\n");
+                handleReturnBook();
                 break;
                 
             case GENERAL_MENU_BACK:

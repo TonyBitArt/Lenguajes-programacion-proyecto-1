@@ -9,4 +9,9 @@
  */
 void advancedSearch(char **searchValues, char **techniques);
 
+/**
+ * @brief Solicita filtros al usuario y ejecuta una búsqueda avanzada.
+ */
+void handleAdvancedSearch(void);
+
 #endif // ADVANCED_SEARCH_H

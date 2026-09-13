@@ -6,9 +6,12 @@
 #include "../headers/dateUtils.h"
 #include "../headers/jsonHandler.h"
 #include "../headers/stats.h"
-#include "..headers/inputUtils.h"
+#include "../headers/inputUtils.h"
+#include "../headers/loanUtils.h"
+#include "../headers/bookUtils.h"
+#include "../headers/userUtils.h"
 
-static struct User getUserByID(struct User *users, int userCount, char* ID) {
+static struct User getUserStructByID(struct User *users, int userCount, char* ID) {
     for (int i = 0; i < userCount; i++) {
         if (strcmp(users[i].ID, ID) == 0) {
             return users[i];
@@ -124,7 +127,7 @@ void printTopUsersLoaned(struct Loan *loans, int loanCount, struct User *users, 
     char **userNames = malloc(sizeof(char *) * distinct);
     struct User user;
     for (int i = 0; i < distinct; i++) {
-        user = getUserByID(users, userCount, userIDs[sortedIndex[i]]);
+        user = getUserStructByID(users, userCount, userIDs[sortedIndex[i]]);
         if (user.name) {
             userNames[i] = malloc(strlen(user.name) + strlen(user.lastName) + 2);
             sprintf(userNames[i], "%s %s", user.name, user.lastName);
@@ -220,4 +223,28 @@ void printGenreLoanStats(struct Loan *loans, int loanCount, struct Book *books, 
     free(genres);
     free(counts);
     free(bookNames);
+}
+
+void printStats() {
+    int loanCount, userCount, bookCount;
+    struct Loan *loans = parseLoans("./data/loans.json", &loanCount);
+    struct User *users = parseUsers("./data/users.json", &userCount);
+    struct Book *books = parseBooks("./data/books.json", &bookCount);
+
+    if (!loans || !users || !books) {
+        fprintf(stderr, "Error: No se pudo cargar la información para generar estadísticas.\n");
+        free(loans);
+        free(users);
+        free(books);
+        return;
+    }
+
+    printTopBooksLoaned(loans, loanCount, 3);
+    printTopUsersLoaned(loans, loanCount, users, userCount, 3);
+    printTopMonthsRevenue(loans, loanCount, 5);
+    printGenreLoanStats(loans, loanCount, books, bookCount);
+
+    freeAllLoans(loans, loanCount);
+    freeAllUsers(users, userCount);
+    freeBooks(books, bookCount);
 }
