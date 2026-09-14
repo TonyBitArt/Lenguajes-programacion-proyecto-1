@@ -6,7 +6,7 @@
 #include "../headers/jsonHandler.h"
 #include "../headers/bookUtils.h"
 
-#define BOOKS_FILE "./program/data/books.json"
+#define BOOKS_FILE_PATH "./data/books.json"
 
 int displayCatalogMenu(void) {
     printf("\n--- Submenú de Gestión de Catálogo ---\n");
@@ -22,7 +22,7 @@ int displayCatalogMenu(void) {
 // muestra todos los libros del catálogo
 static void viewCatalog(void) {
     int bookCount = 0;
-    struct Book *books = parseBooks(BOOKS_FILE, &bookCount);
+    struct Book *books = parseBooks(BOOKS_FILE_PATH, &bookCount);
 
     if (!books || bookCount == 0) {
         printf("\n No hay libros registrados \n");
@@ -147,7 +147,7 @@ static void addSingleBook(void) {
         newBook.summary = bookSummary;
         newBook.quantity = bookQuantity;
 
-        if (!saveBook(BOOKS_FILE, newBook)) {
+        if (!saveBook(BOOKS_FILE_PATH, newBook)) {
             fprintf(stderr, "Error: el libro ya existe o no se pudo guardar en el archivo JSON\n");
         } else {
             printf("Libro guardado exitosamente\n");
@@ -244,7 +244,7 @@ static void addBooksBatch(void) {
         newBook.summary = summary;
         newBook.quantity = quantity;
 
-        if (!saveBook(BOOKS_FILE, newBook)) {
+        if (!saveBook(BOOKS_FILE_PATH, newBook)) {
             fprintf(stderr, "- El libro ya existe: %s\n", originalLine);
             errorCount++;
             continue;
@@ -286,7 +286,7 @@ static void editBookMenu(void) {
         return;
     }
     int bookCount = 0;
-    struct Book *books = parseBooks(BOOKS_FILE, &bookCount);
+    struct Book *books = parseBooks(BOOKS_FILE_PATH, &bookCount);
     struct Book *found = NULL;
     for (int i = 0; i < bookCount; i++) {
         if (books[i].name && strcmp(books[i].name, searchName) == 0) {
@@ -345,7 +345,7 @@ static void editBookMenu(void) {
     updatedBook.summary = !isEmptyString(newSummary) ? newSummary : found->summary;
     updatedBook.quantity = (newQuantity != -1) ? newQuantity : found->quantity;
 
-    if (!editBook(BOOKS_FILE, searchName, updatedBook)) {
+    if (!editBook(BOOKS_FILE_PATH, searchName, updatedBook)) {
         fprintf(stderr, "Error: no se pudo editar (el nuevo nombre ya existe en otro libro o el libro ya no existe)\n");
     } else {
         printf("\nLibro editado correctamente\n");
